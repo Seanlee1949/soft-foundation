@@ -1,0 +1,70 @@
+spring:
+  #H2数据库配置
+  datasource:
+    #驱动
+    driver-class-name: org.h2.Driver
+    #配置h2数据库的连接地址
+    url: jdbc:h2:./database/sf_data
+    #用户名
+    username: root
+    #密码
+    password: admin
+    #H2数据初始化配置
+    platform: h2
+    #每次启动程序，程序都会运行schema.sql文件，对数据库的数据操作；如果数据文件有多个，使用逗号拼接
+    schema: classpath*:sql/h2/db_init/init.sql
+    #每次启动程序，程序都会运行data.sql文件，对数据库的数据操作；如果数据文件有多个，使用逗号拼接
+    data: classpath*:sql/h2/db_init/init_data.sql
+    continue-on-error: true
+    initialization-mode: always
+    resources:
+      static-locations:
+        - classpath: resources
+        - classpath: static
+    mvc:
+      static-path-pattern: /**
+  #      file:./static
+  #      file
+  #H2数据库web访问配置
+  h2:
+    console:
+      path: /h2-console
+      #开启web console功能
+      enabled: true
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 20MB
+      max-request-size: 100MB
+
+  jmx:
+    enabled: false
+
+
+  data:
+    jpa:
+      repositories:
+        bootstrap-mode: lazy
+
+server:
+  port: 9094
+  servlet:
+    #应用上下文
+    context-path: /
+
+mybatis-plus:
+  mapper-locations: classpath*:mappers/*.xml
+  type-enums-package: darwin.unilic.*.*.enums
+
+mybatis:
+  lazy-initialization: true
+
+logging:
+  config: classpath:log/log4j2.xml
+  level:
+    org:
+      springframework:
+        boot:
+          autoconfigure: ERROR
+    # mybatis-plus
+    com.tensquare.base: debug

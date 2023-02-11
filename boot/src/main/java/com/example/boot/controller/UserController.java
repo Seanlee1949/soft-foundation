@@ -24,8 +24,8 @@ public class UserController {
     }
 
     @PostMapping("/user")
-    public String addUser(String userName, String password) {
-        userService.addUser(userName, password);
+    public String addUser(String userName, String password,String name) {
+        userService.addUser(userName, password,name);
         return CommonConstant.SUCCESS;
     }
 

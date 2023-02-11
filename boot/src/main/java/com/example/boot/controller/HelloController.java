@@ -5,6 +5,7 @@ import com.example.boot.data.DataScrap;
 import com.example.boot.entity.vo.HistorysVo;
 import com.example.boot.service.DeviceService;
 import com.example.boot.service.impl.DeviceServiceImpl;
+import com.example.boot.util.CommonUtils;
 import com.example.boot.util.cache.CacheManagerImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -78,4 +79,11 @@ public class HelloController {
         new CacheManagerImpl().clearAll();
         deviceService.getAllHistoryDetailData();
     }
+//    @GetMapping("auto-update")
+//    public void autoUpdatedata(){
+//        //
+//        long currentTime = CommonUtils.getCurrentTime();
+//        long originTime =
+//
+//    }
 }

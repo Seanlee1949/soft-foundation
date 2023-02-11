@@ -49,9 +49,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void addUser(String userName, String password) {
+    public void addUser(String userName, String password,String name) {
         String currentTime = getCurrentTime();
-        UserInfo userInfo = new UserInfo().setUserName(userName).setPassword(password).setCreateTime(currentTime);
+        UserInfo userInfo = new UserInfo().setUserName(userName).setPassword(password).setName(name).setCreateTime(currentTime);
         userMapper.insert(userInfo);
     }
 

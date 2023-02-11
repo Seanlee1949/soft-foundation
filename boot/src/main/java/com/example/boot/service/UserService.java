@@ -9,7 +9,7 @@ import com.example.boot.entity.vo.LoginVo;
 public interface UserService {
     LoginVo login(String userName, String password);
 
-    void addUser(String userName, String password);
+    void addUser(String userName, String password,String name);
 
     void deleteUser(String userName);
 }

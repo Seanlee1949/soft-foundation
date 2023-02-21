@@ -65,7 +65,7 @@ logging:
     org:
       springframework:
         boot:
-          autoconfigure: ERROR
-#          autoconfigure: DEBUG
+#          autoconfigure: ERROR
+          autoconfigure: DEBUG
     # mybatis-plus
     com.tensquare.base: debug

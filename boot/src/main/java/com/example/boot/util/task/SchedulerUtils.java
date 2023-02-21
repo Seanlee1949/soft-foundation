@@ -2,6 +2,8 @@ package com.example.boot.util.task;
 
 import com.example.boot.data.DataScrap;
 import com.example.boot.service.impl.DeviceServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +18,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Component
 public class SchedulerUtils {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerUtils.class);
         @Autowired
     private Scheduler scheduler;
 //    private Scheduler
@@ -25,6 +28,10 @@ public class SchedulerUtils {
         //获取当前时间
         Calendar currentDate = Calendar.getInstance();
         long currentDateLong = currentDate.getTime().getTime();
+
+        // 先执行一次
+        LOGGER.debug("启动执行一次");
+        scheduler.run();
 
         System.out.println("Current Date = " + currentDate.getTime().toString());
         //计算满足条件的最近一次执行时间
@@ -42,7 +49,7 @@ public class SchedulerUtils {
         long delay = earliestDateLong - currentDateLong;
         //计算执行周期为一天
 //        long period = 24 * 60 * 60 * 1000;
-        long period = 5 * 1000;
+        long period = 60 * 1000;
         ScheduledExecutorService service = Executors.newScheduledThreadPool(10);
         //从现在开始delay毫秒之后，每隔一星期执行一次job1
         service.scheduleAtFixedRate(scheduler, delay, period,

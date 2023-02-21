@@ -48,26 +48,28 @@ public class Scheduler extends TimerTask {
     @Override
     public void run() {
         Date date = new Date();
-        System.out.println("Date = " + date + ", execute " + jobName);
+        System.out.println("执行任务 ：Date = " + date + ", execute " + jobName);
 
         long endTime = date.getTime();
         long startTime = endTime - 1000 * 60 * 60 * 48;
 
-        List<HistorysVo> historysVos = dataScrap.collectHistoryDataToObject(startTime, endTime);
+        List<HistorysVo> historysVos = dataScrap.collectHistoryDataToObject(startTime/1000, endTime/1000);
 //        1671638400  1671724800
         int index = 0;
         for (HistorysVo historysVo : historysVos) {
             index++;
             dataScrap.dealHistoryVoAndInsertOrUpdate(index, historysVo, false);
         }
-        refreshCache();
+        deviceService.refreshCache();
     }
 
-    private void refreshCache() {
-
-        new CacheManagerImpl().clearAll();
-        deviceService.getAllHistoryDetailData();
-    }
+//    private void refreshCache() {
+//
+//        new CacheManagerImpl().clearAll();
+//        deviceService.getAllHistoryData();
+//        deviceService.getAllHistoryDetailData();
+//        deviceService.getDetailAndDeviceMap();
+//    }
 
     /**
      * YEAR + MONTH + DAY_OF_MONTH

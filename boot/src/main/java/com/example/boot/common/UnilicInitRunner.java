@@ -33,6 +33,8 @@ public class UnilicInitRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         deviceService.getAllHistoryDetailData();
+        deviceService.getAllHistoryData();
+        deviceService.getDetailAndDeviceMap();
         schedulerUtils.startJob();
     }
 

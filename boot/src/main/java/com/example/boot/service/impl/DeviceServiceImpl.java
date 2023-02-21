@@ -1,5 +1,6 @@
 package com.example.boot.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.boot.dao.DeviceGroupMapper;
 import com.example.boot.dao.HistoryDataMapper;
 import com.example.boot.dao.HistoryDetailDataMapper;
@@ -12,7 +13,10 @@ import com.example.boot.entity.dto.Record;
 import com.example.boot.entity.vo.*;
 import com.example.boot.service.DeviceService;
 import com.example.boot.util.CacheUtils;
+import com.example.boot.util.cache.CacheManagerImpl;
 import com.example.boot.util.cache.EntityCache;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -26,6 +30,7 @@ import java.util.stream.Collectors;
  */
 @Service
 public class DeviceServiceImpl implements DeviceService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeviceServiceImpl.class);
     private final DeviceGroupMapper deviceGroupMapper;
     private final HistoryDataMapper historyDataMapper;
     private final HistoryDetailDataMapper historyDetailDataMapper;
@@ -151,12 +156,67 @@ public class DeviceServiceImpl implements DeviceService {
                                      Long minAsh, Long maxAsh,
                                      Long minAvgAsh, Long maxAvgAsh,
                                      Long minPileTime, Long maxPileTime) {
+//        QueryWrapper<HistoryData> queryWrapper = new QueryWrapper<>();
+//        // deviceType
+//        if (deviceType != null) {
+//            queryWrapper.eq("DEVICE_TYPE", deviceType);
+//        }
+//        // deviceKey
+//        if (!StringUtils.isEmpty(deviceKey)) {
+//            queryWrapper.eq("DEVICE_KEY", deviceKey);
+//        }
+//        // pileDescribe
+//        if (!StringUtils.isEmpty(pileDescribe)) {
+//            queryWrapper.eq("PILE_DESCRIBE", pileDescribe);
+//        }
+//        // Long startTime, Long endTime,
+//        if (startTime != null) {
+//            queryWrapper.ge("END_TIME", startTime);
+//        }
+//        if (endTime != null) {
+//            queryWrapper.lt("END_TIME", endTime);
+//        }
+//        // Long minDepth, Long maxDepth,
+//        if (minDepth != null) {
+//            queryWrapper.gt("FR_DEPTH", minDepth);
+//        }
+//        if (maxDepth != null) {
+//            queryWrapper.lt("FR_DEPTH", minDepth);
+//        }
+//        // Long minAsh, Long maxAsh,
+//        if (minAsh != null) {
+//            queryWrapper.ge("CUMULATIVE_ASH", minAsh);
+//        }
+//        if (maxAsh != null) {
+//            queryWrapper.lt("CUMULATIVE_ASH", maxAsh);
+//        }
+//        //  Long minAvgAsh, Long maxAvgAsh,
+//        if (minAvgAsh != null) {
+//            queryWrapper.ge("AVERAGE_ASH", minAvgAsh);
+//        }
+//        if (maxAvgAsh != null) {
+//            queryWrapper.lt("AVERAGE_ASH", maxAvgAsh);
+//        }
+//        // Long minPileTime, Long maxPileTime
+//        if (minPileTime != null) {
+//            queryWrapper.ge("PILE_TIME", minPileTime);
+//        }
+//        if (maxPileTime != null) {
+//            queryWrapper.lt("PILE_TIME", maxPileTime);
+//        }
+//        queryWrapper.orderBy(true,false,"END_TIME");
+//        List<HistoryData>  collect = historyDataMapper.selectList(queryWrapper);
+//        Integer totalElements = historyDataMapper.selectCount(queryWrapper);
 
-        List<HistoryData> historyDataList = historyDataMapper.selectByDeviceType(deviceType);
-        historyDataList.sort((o1, o2) -> {
-            return (int) (o2.getEndTime() - o1.getEndTime());
-        });
+//        List<HistoryData> historyDataList = historyDataMapper.selectByDeviceType(deviceType);
+        List<HistoryData> historyDataList = getAllHistoryData();
+//        historyDataList.sort((o1, o2) -> {
+//            return (int) (o2.getEndTime() - o1.getEndTime());
+//        });
         List<HistoryData> collect = historyDataList.stream()
+                .filter(historyData -> {
+                    return historyData.getDeviceType().equals(deviceType);
+                })
                 // deviceKey
                 .filter(historyData -> {
                     if (!StringUtils.isEmpty(deviceKey)) {
@@ -205,15 +265,15 @@ public class DeviceServiceImpl implements DeviceService {
                 })
                 // Long minAsh, Long maxAsh,
                 .filter(historyData -> {
-                    if (minDepth != null) {
-                        return historyData.getCumulativeAsh() > minDepth;
+                    if (minAsh != null) {
+                        return historyData.getCumulativeAsh() > minAsh;
                     } else {
                         return true;
                     }
                 })
                 .filter(historyData -> {
-                    if (maxDepth != null) {
-                        return historyData.getCumulativeAsh() < maxDepth;
+                    if (maxAsh != null) {
+                        return historyData.getCumulativeAsh() < maxAsh;
                     } else {
                         return true;
                     }
@@ -266,12 +326,16 @@ public class DeviceServiceImpl implements DeviceService {
         }
 
         List<HistoryDetailData> historyDetailDataListAll = getAllHistoryDetailData();
+        Map<String, List<HistoryDetailData>> detailAndDeviceMap = getDetailAndDeviceMap();
         for (HistoryData historyData : content) {
             String deviceKeyTemp = historyData.getDeviceKey();
             String pileDescribeTemp = historyData.getPileDescribe();
-            List<HistoryDetailData> historyDetailDataList = historyDetailDataListAll.stream().filter(historyDetailData -> {
-                return historyDetailData.getDeviceKey().equals(deviceKeyTemp) && historyDetailData.getPileDescribe().equals(pileDescribeTemp);
-            }).collect(Collectors.toList());
+            String identifier = deviceKeyTemp + "-" + pileDescribeTemp;
+            List<HistoryDetailData> historyDetailDataList = detailAndDeviceMap.get(identifier);
+//            List<HistoryDetailData> historyDetailDataList = historyDetailDataListAll.stream().filter(historyDetailData -> {
+//                return historyDetailData.getDeviceKey().equals(deviceKeyTemp)
+//                        && historyDetailData.getPileDescribe().equals(pileDescribeTemp);
+//            }).collect(Collectors.toList());
 //            List<HistoryDetailData> historyDetailDataList = historyDetailDataMapper.selectByDeviceKey(deviceKeyTemp, pileDescribeTemp);
             historyData.setData(historyDetailDataList);
         }
@@ -346,15 +410,78 @@ public class DeviceServiceImpl implements DeviceService {
         return totalPages;
     }
 
+    public void refreshCache() {
+        LOGGER.debug("开始刷新缓存");
+
+        new CacheManagerImpl().clearAll();
+        getAllHistoryData();
+        getAllHistoryDetailData();
+        getDetailAndDeviceMap();
+        LOGGER.debug("刷新缓存完毕");
+    }
+
     public List<HistoryDetailData> getAllHistoryDetailData() {
+
         String key = "historyDetailDataListAll";
         EntityCache entityCache = CacheUtils.cacheManagerImpl.getCacheByKey(key);
         if (entityCache == null) {
+            LOGGER.debug("开始刷新缓存historyDetailDataListAll");
             List<HistoryDetailData> historyDetailDataListAll = historyDetailDataMapper.selectList(null);
             CacheUtils.cacheManagerImpl.putCache(key, historyDetailDataListAll, 0);
+            LOGGER.debug("刷新缓存完毕historyDetailDataListAll");
             return historyDetailDataListAll;
         } else {
+            LOGGER.debug("获取缓存数据historyDetailDataListAll");
             return (List<HistoryDetailData>) entityCache.getDatas();
+        }
+    }
+
+
+    public Map<String, List<HistoryDetailData>> getDetailAndDeviceMap() {
+        String key = "deviceIdentifierAndDetailMap";
+        EntityCache entityCache = CacheUtils.cacheManagerImpl.getCacheByKey(key);
+        if (entityCache == null) {
+            LOGGER.debug("开始刷新缓存deviceIdentifierAndDetailMap");
+            Map<String, List<HistoryDetailData>> deviceIdentifierAndDetailMap = new LinkedHashMap<>();
+            List<HistoryDetailData> allHistoryDetailData = getAllHistoryDetailData();
+            for (HistoryDetailData historyDetailData : allHistoryDetailData) {
+                String identifier = historyDetailData.getDeviceKey() + "-" + historyDetailData.getPileDescribe();
+
+                List<HistoryDetailData> temp = deviceIdentifierAndDetailMap.get(key);
+                if (temp == null) {
+                    List<HistoryDetailData> historyDetailDataList = new ArrayList<>();
+                    historyDetailDataList.add(historyDetailData);
+                    deviceIdentifierAndDetailMap.put(identifier, historyDetailDataList);
+
+                } else {
+
+                    temp.add(historyDetailData);
+                }
+            }
+            CacheUtils.cacheManagerImpl.putCache(key, deviceIdentifierAndDetailMap, 0);
+            LOGGER.debug("刷新缓存完毕deviceIdentifierAndDetailMap");
+            return deviceIdentifierAndDetailMap;
+        } else {
+            LOGGER.debug("获取缓存数据deviceIdentifierAndDetailMap");
+            return (Map<String, List<HistoryDetailData>>) entityCache.getDatas();
+        }
+    }
+
+    public List<HistoryData> getAllHistoryData() {
+        String key = "historyDataAll";
+        EntityCache entityCache = CacheUtils.cacheManagerImpl.getCacheByKey(key);
+        if (entityCache == null) {
+            LOGGER.debug("开始刷新缓存historyDataAll");
+            List<HistoryData> historyDataList = historyDataMapper.selectList(null);
+            historyDataList.sort((o1, o2) -> {
+                return (int) (o2.getEndTime() - o1.getEndTime());
+            });
+            CacheUtils.cacheManagerImpl.putCache(key, historyDataList, 0);
+            LOGGER.debug("刷新缓存完毕historyDataAll");
+            return historyDataList;
+        } else {
+            LOGGER.debug("获取缓存数据historyDataAll");
+            return (List<HistoryData>) entityCache.getDatas();
         }
     }
 }

@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 2022/11/28
  */
 public class CacheManagerImpl implements ICacheManager {
-    private static Map<String, EntityCache> caches = new ConcurrentHashMap<String, EntityCache>();
+    private static Map<String, EntityCache> caches = new ConcurrentHashMap<String, EntityCache>(1000);
 
     /**
      * 存入缓存

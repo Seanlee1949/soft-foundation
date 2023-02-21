@@ -76,8 +76,8 @@ public class HelloController {
 
     @GetMapping("/refreshCache")
     public void refreshCache() {
-        new CacheManagerImpl().clearAll();
-        deviceService.getAllHistoryDetailData();
+
+        deviceService.refreshCache();
     }
 //    @GetMapping("auto-update")
 //    public void autoUpdatedata(){

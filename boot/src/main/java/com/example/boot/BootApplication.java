@@ -1,6 +1,5 @@
 package com.example.boot;
 
-import com.example.boot.service.impl.DeviceServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -14,5 +13,4 @@ private static final Logger LOGGER = LoggerFactory.getLogger(BootApplication.cla
         SpringApplication.run(BootApplication.class, args);
         LOGGER.debug("………………项目启动完成………………");
     }
-
 }

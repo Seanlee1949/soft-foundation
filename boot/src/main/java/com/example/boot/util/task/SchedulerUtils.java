@@ -19,9 +19,9 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class SchedulerUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerUtils.class);
-        @Autowired
+    @Autowired
     private Scheduler scheduler;
-//    private Scheduler
+
     public void startJob() {
 
 //        Scheduler test = new Scheduler(dataScrap);
@@ -54,6 +54,5 @@ public class SchedulerUtils {
         //从现在开始delay毫秒之后，每隔一星期执行一次job1
         service.scheduleAtFixedRate(scheduler, delay, period,
                 TimeUnit.MILLISECONDS);
-
     }
 }

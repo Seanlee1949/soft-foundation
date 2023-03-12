@@ -447,7 +447,7 @@ public class DeviceServiceImpl implements DeviceService {
             for (HistoryDetailData historyDetailData : allHistoryDetailData) {
                 String identifier = historyDetailData.getDeviceKey() + "-" + historyDetailData.getPileDescribe();
 
-                List<HistoryDetailData> temp = deviceIdentifierAndDetailMap.get(key);
+                List<HistoryDetailData> temp = deviceIdentifierAndDetailMap.get(identifier);
                 if (temp == null) {
                     List<HistoryDetailData> historyDetailDataList = new ArrayList<>();
                     historyDetailDataList.add(historyDetailData);

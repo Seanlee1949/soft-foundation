@@ -48,10 +48,10 @@ public class SchedulerUtils {
         //计算从当前时间到最近一次执行时间的时间间隔
         long delay = earliestDateLong - currentDateLong;
         //计算执行周期为一天
-//        long period = 24 * 60 * 60 * 1000;
-        long period = 60 * 1000;
+        long period = 24 * 60 * 60 * 1000;
+//        long period = 60 * 1000;
         ScheduledExecutorService service = Executors.newScheduledThreadPool(10);
-        //从现在开始delay毫秒之后，每隔一星期执行一次job1
+        //从现在开始delay毫秒之后，每隔一天执行一次job1
         service.scheduleAtFixedRate(scheduler, delay, period,
                 TimeUnit.MILLISECONDS);
     }

@@ -6,6 +6,8 @@ package com.example.boot.data;
  */
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import java.io.BufferedReader;
@@ -18,11 +20,13 @@ import java.util.List;
 import java.util.Map;
 
 public class HttpRequest {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpRequest.class);
+    private static int count = 0;
 
 //   public Object proxySend(String url){
 //
 //    }
+
     /**
      * 向指定URL发送GET方法的请求
      *
@@ -30,7 +34,8 @@ public class HttpRequest {
      * @param param 请求参数，请求参数应该是 name1=value1&name2=value2 的形式。
      * @return URL 所代表远程资源的响应结果
      */
-    public static String sendGet(String url, String param,String token) {
+    public static String sendGet(String url, String param, String token) {
+        count++;
         String result = "";
         BufferedReader in = null;
         try {
@@ -57,7 +62,8 @@ public class HttpRequest {
             Map<String, List<String>> map = connection.getHeaderFields();
             // 遍历所有的响应头字段
             for (String key : map.keySet()) {
-                System.out.println(key + "--->" + map.get(key));
+                LOGGER.trace("处理数据----->{}", count);
+//                System.out.println(key + "--->" + map.get(key));
             }
             // 定义 BufferedReader输入流来读取URL的响应
             in = new BufferedReader(new InputStreamReader(

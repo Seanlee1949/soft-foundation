@@ -5,5 +5,9 @@ package com.example.boot.constant;
  * @since 2022/11/25
  */
 public class CommonConstant {
+    private CommonConstant() {
+        // 静态类
+    }
+
     public static final String SUCCESS = "success";
 }

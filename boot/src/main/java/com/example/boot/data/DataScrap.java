@@ -240,9 +240,10 @@ public class DataScrap {
 
         int totalPages = getTotalPages(startTime, endTime, token);
         List<HistorysVo> historysVoList = new ArrayList<>();
-
+        LOGGER.info("共查询到数据{}页", totalPages);
         for (int page = 0; page <= totalPages + 1; page++) {
-            System.out.println("加载第" + page + "页");
+//            System.out.println("加载第" + page + "页");
+            LOGGER.debug("加载第{}页", page);
             String url = "https://platform.hzcjkj.com/api/historys?deviceType=JBZ&page=" + page + "&deviceKey=&size=10&pileDescribe=&startTime="
                     + startTime + "&endTime=" + endTime;
             String historyResponse = HttpRequest.sendGet(url, "", token);
@@ -255,6 +256,7 @@ public class DataScrap {
 //            FileUtils.appendStringToFile("./history_2.txt", JsonUtils.writeAsJson(historysVo));
 //            FileUtils.appendStringToFile("./history_2.txt", "\n");
         }
+        LOGGER.info("收集到的数据数量，historysVoList.size->{}", historysVoList.size());
         return historysVoList;
         //发送 POST 请求
 //        String sr=HttpRequest.sendPost("http://localhost:6144/Home/RequestPostString", "key=123&v=456");

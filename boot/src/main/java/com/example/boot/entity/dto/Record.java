@@ -9,7 +9,7 @@ import com.example.boot.entity.vo.RealTime;
  * @author lishuai
  * @since 2022/11/25
  */
-@TableName("SF_RECORD")
+@TableName(value = "SF_RECORD",autoResultMap = true)
 public class Record {
     private long activeAt;
     private String alias;
@@ -35,7 +35,7 @@ public class Record {
     private long onlineTime;
     private String position;
     private int productId;
-    @TableField(typeHandler = FastjsonTypeHandler.class)
+    @TableField(typeHandler = FastjsonTypeHandler.class,value = "REALTIME")
     private RealTime realtime;
     private int status;
     private String thumbnailBaseUrl;

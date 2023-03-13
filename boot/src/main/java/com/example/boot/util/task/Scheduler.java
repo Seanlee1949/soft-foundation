@@ -51,7 +51,7 @@ public class Scheduler extends TimerTask {
         System.out.println("执行任务 ：Date = " + date + ", execute " + jobName);
 
         long endTime = date.getTime();
-        long startTime = endTime - (1000L * 60 * 60 * 24 * 48);
+        long startTime = endTime - (1000L * 60 * 60 * 24 * 2);
 //        long startTime = endTime - (1000L * 60 * 60 * 24 * 365L);
 
         List<HistorysVo> historysVos = dataScrap.collectHistoryDataToObject(startTime/1000, endTime/1000);

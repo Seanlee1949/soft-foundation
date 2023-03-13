@@ -54,10 +54,11 @@ public class DeviceController {
 
     @GetMapping("/devices")
     public Object getDevices(int size, int current, String deviceType) {
-        String url = replaceUrl + "/api/devices?" + "size=" + size + "&current=" + current + "&deviceType=" + deviceType;
-        String s = HttpRequest.sendGet(url, "", token);
-        return JsonUtils.parseObject(s, Object.class);
-//        return deviceService.getDevices(size, current, deviceType);
+//        String url = replaceUrl + "/api/devices?" + "size=" + size + "&current=" + current + "&deviceType=" + deviceType;
+//        String s = HttpRequest.sendGet(url, "", token);
+
+        return deviceService.getDevices(size, current, deviceType);
+//        return JsonUtils.parseObject(s, Object.class);
     }
 
 //    /**
@@ -107,11 +108,11 @@ public class DeviceController {
      */
     @GetMapping("/historys")
     public Object getHistory(String deviceType, int page, String deviceKey, int size, String pileDescribe,
-                                 Long startTime, Long endTime,
-                                 Long minDepth, Long maxDepth,
-                                 Long minAsh, Long maxAsh,
-                                 Long minAvgAsh, Long maxAvgAsh,
-                                 Long minPileTime, Long maxPileTime) {
+                             Long startTime, Long endTime,
+                             Long minDepth, Long maxDepth,
+                             Long minAsh, Long maxAsh,
+                             Long minAvgAsh, Long maxAvgAsh,
+                             Long minPileTime, Long maxPileTime) {
         return JsonUtils.writeAsJson(deviceService.getHistoryData(deviceType, page, deviceKey, size, pileDescribe,
                 startTime, endTime,
                 minDepth, maxDepth,

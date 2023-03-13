@@ -1,9 +1,14 @@
 package com.example.boot.controller;
 
 import com.example.boot.constant.CommonConstant;
+import com.example.boot.dao.RecordMapper;
 import com.example.boot.data.DataScrap;
+import com.example.boot.data.HttpRequest;
+import com.example.boot.entity.dto.Record;
+import com.example.boot.entity.vo.DeviceResponse;
 import com.example.boot.entity.vo.HistorysVo;
 import com.example.boot.service.impl.DeviceServiceImpl;
+import com.example.boot.util.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +26,17 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/api/data")
 public class MockDataController {
+    public static String token = "/KfKIFu+USTe4bk6MbApucs3+FWDIbDUKVCM43WXkvkXDsOKsBO5NjjphxiepCWc";
+    public static String replaceUrl = "https://platform.hzcjkj.com";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(MockDataController.class);
     @Autowired
     private DataScrap dataScrap;
     @Autowired
     private DeviceServiceImpl deviceService;
+
+    @Autowired
+    private RecordMapper recordMapper;
 
     @GetMapping()
     public String updateDataBase(String data) {
@@ -74,6 +85,24 @@ public class MockDataController {
 
         deviceService.refreshCache();
     }
+
+    @GetMapping("update-device")
+    public void updateDevices() {
+        String url = replaceUrl + "/api/devices?" + "size=" + 20 + "&current=" + 0 + "&deviceType=" + "JBZ";
+        String s = HttpRequest.sendGet(url, "", token);
+        DeviceResponse deviceResponse = JsonUtils.parseObject(s, DeviceResponse.class);
+
+        recordMapper.delete(null);
+
+        Record[] records = deviceResponse.getResult().getRecords();
+        for (Record record : records) {
+            recordMapper.insert(record);
+        }
+        recordMapper.selectList(null);
+        LOGGER.info("刷新设备数据成功");
+    }
+
+
 //    @GetMapping("auto-update")
 //    public void autoUpdatedata(){
 //        //

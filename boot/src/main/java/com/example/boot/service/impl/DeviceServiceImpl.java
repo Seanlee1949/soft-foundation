@@ -370,18 +370,27 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     public DeviceResponse getDevices(int size, int current, String deviceType) {
+        if (current == 0) {
+            current = 1;
+        }
         List<Record> recordList = recordMapper.selectList(null);
         if (!StringUtils.isEmpty(deviceType)) {
             recordList = recordList.stream().filter(record -> record.getType().equals(deviceType)).collect(Collectors.toList());
         }
         int total = recordList.size();
+        int pages = total % size == 0 ? total / size : total / size + 1;
+
+
         DeviceResult deviceResult = new DeviceResult();
-        deviceResult.setRecords(recordList.toArray(new Record[0]));
+        int start = (current - 1) * size + 1 - 1;
+        int end = Math.min(current * size, total);
+        List<Record> showRecords = recordList.subList(start, end);
+        deviceResult.setRecords(showRecords.toArray(new Record[0]));
         deviceResult.setTotal(total);
         deviceResult.setSize(size);
         deviceResult.setSearchCount(true);
         deviceResult.setOrders(new int[0]);
-        deviceResult.setPages(1);
+        deviceResult.setPages(pages);
         deviceResult.setCurrent(1);
 
         deviceResult.setSuccess(true);

@@ -53,7 +53,7 @@ public class DeviceController {
     }
 
     @GetMapping("/devices")
-    public Object getDevices(int size, int current, String deviceType) {
+    public Object getDevices(int size, int current, String deviceType, @CookieValue("userName") String userName) {
 //        String url = replaceUrl + "/api/devices?" + "size=" + size + "&current=" + current + "&deviceType=" + deviceType;
 //        String s = HttpRequest.sendGet(url, "", token);
 

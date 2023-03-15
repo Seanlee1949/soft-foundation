@@ -103,6 +103,43 @@ public class MockDataController {
     }
 
 
+    @GetMapping("/update-history-data")
+    public void updateHistoryDataByFile() {
+        // 污水泵项目
+
+        //顺序号
+        String order = "1";
+        // 排桩号
+        String pileDiscribe = "510";
+        // 开始时间
+        long beginTime = 123123;
+        // 结束时间
+        long endTime = 123123;
+        // 施工总桩长  DEPTH
+        double depth = 24.05;
+
+        // 电流(A)  MAX_CURRENT  PILE_TOP_CURRENT
+
+        // 第一次下钻速度
+        // 第一次上升速度
+        // 第二次下钻速度
+        // 第二次上升速度
+        // 压力   AVERAGE_PRESSURE
+        // 流量
+        // 单桩喷浆量  CUMULATIVE_PULP
+        // 垂直度    Y_ANGEL
+        // 水泥浆比重
+        // 水泥用量  CUMULATIVE_ASH
+
+
+
+
+        HistorysVo historysVo = new HistorysVo();
+
+
+    }
+
+
 //    @GetMapping("auto-update")
 //    public void autoUpdatedata(){
 //        //

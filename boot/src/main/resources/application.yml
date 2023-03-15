@@ -31,6 +31,8 @@ spring:
       path: /h2-console
       #开启web console功能
       enabled: true
+      settings:
+        web-allow-others: on
   servlet:
     multipart:
       enabled: true
@@ -47,7 +49,7 @@ spring:
         bootstrap-mode: lazy
 
 server:
-  port: 9094
+  port: 9095
   servlet:
     #应用上下文
     context-path: /

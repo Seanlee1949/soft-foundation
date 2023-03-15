@@ -1,6 +1,7 @@
 package com.example.boot.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.boot.constant.CommonConstant;
 import com.example.boot.dao.DeviceGroupMapper;
 import com.example.boot.dao.HistoryDataMapper;
 import com.example.boot.dao.HistoryDetailDataMapper;
@@ -15,6 +16,7 @@ import com.example.boot.service.DeviceService;
 import com.example.boot.util.CacheUtils;
 import com.example.boot.util.cache.CacheManagerImpl;
 import com.example.boot.util.cache.EntityCache;
+import org.apache.logging.log4j.ThreadContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -156,6 +159,7 @@ public class DeviceServiceImpl implements DeviceService {
                                      Long minAsh, Long maxAsh,
                                      Long minAvgAsh, Long maxAvgAsh,
                                      Long minPileTime, Long maxPileTime) {
+        List<String> validKeyList = getvalidKeys();
 //        QueryWrapper<HistoryData> queryWrapper = new QueryWrapper<>();
 //        // deviceType
 //        if (deviceType != null) {
@@ -209,7 +213,12 @@ public class DeviceServiceImpl implements DeviceService {
 //        Integer totalElements = historyDataMapper.selectCount(queryWrapper);
 
 //        List<HistoryData> historyDataList = historyDataMapper.selectByDeviceType(deviceType);
-        List<HistoryData> historyDataList = getAllHistoryData();
+        List<HistoryData> historyDataList = getAllHistoryData().stream().filter(new Predicate<HistoryData>() {
+            @Override
+            public boolean test(HistoryData historyData) {
+                return validKeyList.contains(historyData.getDeviceKey());
+            }
+        }).collect(Collectors.toList());
 //        historyDataList.sort((o1, o2) -> {
 //            return (int) (o2.getEndTime() - o1.getEndTime());
 //        });
@@ -370,10 +379,16 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     public DeviceResponse getDevices(int size, int current, String deviceType) {
+        List<String> validKeyList = getvalidKeys();
+
+
         if (current == 0) {
             current = 1;
         }
-        List<Record> recordList = recordMapper.selectList(null);
+
+        QueryWrapper<Record> queryWrapper = new QueryWrapper();
+        queryWrapper.in("KEY_", validKeyList);
+        List<Record> recordList = recordMapper.selectList(queryWrapper);
         if (!StringUtils.isEmpty(deviceType)) {
             recordList = recordList.stream().filter(record -> record.getType().equals(deviceType)).collect(Collectors.toList());
         }
@@ -401,6 +416,19 @@ public class DeviceServiceImpl implements DeviceService {
         return deviceResponse;
 
     }
+
+    private List<String> getvalidKeys() {
+        List<String> validKeyList = new ArrayList<>();
+
+        String userName = ThreadContext.get(CommonConstant.USER_NAME);
+        if (userName.equals("污水泵站")) {
+            validKeyList.add("MX01808023020020");
+        } else {
+            validKeyList = recordMapper.selectAllKeys();
+        }
+        return validKeyList;
+    }
+
 
     @Override
     public HistoryAnalysis getHistoryAnalysis(String deviceKey, String deviceType, long beginDate, long endDate) {

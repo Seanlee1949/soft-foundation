@@ -32,7 +32,7 @@ spring:
       #开启web console功能
       enabled: true
       settings:
-        web-allow-others: on
+        web-allow-others: true
   servlet:
     multipart:
       enabled: true

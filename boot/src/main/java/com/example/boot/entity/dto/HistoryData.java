@@ -62,7 +62,7 @@ public class HistoryData {
     private int standardAsh;
     private double pileTopCurrent;
     private int maxAngle;
-    private int pileTime;
+    private double pileTime;
     private String mileNo;
     private String partNo;
     private String milePartNo;
@@ -423,11 +423,11 @@ public class HistoryData {
         return maxAngle;
     }
 
-    public void setPileTime(int pileTime) {
+    public void setPileTime(double pileTime) {
         this.pileTime = pileTime;
     }
 
-    public int getPileTime() {
+    public double getPileTime() {
         return pileTime;
     }
 

@@ -27,4 +27,8 @@ public interface DeviceService {
 
 
     HistoryAnalysis getHistoryAnalysis(String deviceKey, String deviceType, long beginDate, long endDate);
+
+    List<GroupSumVo> groupSum();
+
+    List<NewestVo> getNewest();
 }

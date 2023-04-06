@@ -128,7 +128,8 @@ public class DeviceController {
     public List<GroupSumVo> groupSum() {
         String url = replaceUrl + "/api/groupSum";
         String s = HttpRequest.sendGet(url, "", token);
-        return JsonUtils.parseObject(s, List.class);
+//        return JsonUtils.parseObject(s, List.class);
+        return deviceService.groupSum();
 //        return new GroupSumVo[0];
     }
 
@@ -137,7 +138,8 @@ public class DeviceController {
     public List<NewestVo> getNewest() {
         String url = replaceUrl + "/api/newest";
         String s = HttpRequest.sendGet(url, "", token);
-        return JsonUtils.parseObject(s, List.class);
+//        return JsonUtils.parseObject(s, List.class);
+        return deviceService.getNewest();
 //        return new NewestVo[0];
     }
 
@@ -188,9 +190,9 @@ public class DeviceController {
         String url = replaceUrl + "/api/historyAnalysis?" + "deviceKey=" + deviceKey + "&deviceType=" + deviceType
                 + "&beginData=" + beginDate + "&endData=" + endDate;
         String s = HttpRequest.sendGet(url, "", token);
-        return JsonUtils.parseObject(s, Object.class);
+//        return JsonUtils.parseObject(s, Object.class);
 
-//        return deviceService.getHistoryAnalysis(deviceKey, deviceType, beginDate, endDate);
+        return deviceService.getHistoryAnalysis(deviceKey, deviceType, beginDate, endDate);
     }
 
     /**

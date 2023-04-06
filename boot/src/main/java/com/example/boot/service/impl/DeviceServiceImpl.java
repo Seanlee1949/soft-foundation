@@ -432,9 +432,99 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     public HistoryAnalysis getHistoryAnalysis(String deviceKey, String deviceType, long beginDate, long endDate) {
+        List<HistoryData> allHistoryData = getAllHistoryData();
+        List<HistoryData> historyDataList = allHistoryData.stream().filter(historyData -> {
+            if (!StringUtils.isEmpty(deviceKey)) {
+                return historyData.getDeviceKey().equals(deviceKey);
+            } else {
+                return true;
+            }
+        })
+                .filter(historyData -> {
+                    if (!StringUtils.isEmpty(deviceType)) {
+                        return historyData.getDeviceType().equals(deviceType);
+                    } else {
+                        return true;
+                    }
+                })
+                .filter(historyData -> {
+                    return historyData.getEndTime() > beginDate;
+                })
+                .filter(historyData -> {
+                    return historyData.getEndTime() < endDate;
+                }).collect(Collectors.toList());
+        HistoryAnalysis historyAnalysis = new HistoryAnalysis();
+        long startTime = -1;
+        long endTime = -1;
+        double totalDepth = 0.0;
+        double totalCumulativeAsh = 0.0;
+        double totalCumulativePulp = 0.0;
+        double totalPileNum = 0.0;
+
+        for (int i = 0; i < historyDataList.size(); i++) {
+            HistoryData historyData = historyDataList.get(i);
+            if (startTime == -1 || startTime < historyData.getBeginTime()) {
+                startTime = historyData.getBeginTime();
+            }
+            if (endTime == -1 || endTime > historyData.getEndTime()) {
+                endTime = historyData.getEndTime();
+            }
+            totalDepth = totalDepth + historyData.getDepth();
+            totalCumulativeAsh = totalCumulativeAsh + historyData.getCumulativeAsh();
+            totalCumulativePulp = totalCumulativePulp + historyData.getCumulativePulp();
 
 
-        return null;
+        }
+        historyAnalysis.setTotalDepth(totalDepth);
+        historyAnalysis.setTotalCumulativeAsh(totalCumulativeAsh);
+        historyAnalysis.setTotalCumulativePulp(totalCumulativePulp);
+        historyAnalysis.setTotalPileNum(historyDataList.size());
+        historyAnalysis.setBeginTime(startTime);
+        historyAnalysis.setEndTime(endTime);
+        historyAnalysis.setAvgAsh(totalCumulativeAsh / totalDepth);
+        historyAnalysis.setAvgPulp(totalCumulativePulp / totalDepth);
+
+        return historyAnalysis;
+    }
+
+    @Override
+    public List<GroupSumVo> groupSum() {
+        GroupSumVo groupSumVo = new GroupSumVo();
+        groupSumVo.setDeviceType("JBZ");
+        List<HistoryData> allHistoryData = getAllHistoryData();
+
+        double totalDepth = 0;
+        for (int i = 0; i < allHistoryData.size(); i++) {
+            totalDepth = totalDepth + allHistoryData.get(i).getDepth();
+        }
+        groupSumVo.setTotal(allHistoryData.size());
+        groupSumVo.setTotal_depth(totalDepth);
+        return Collections.singletonList(groupSumVo);
+
+    }
+
+    @Override
+    public List<NewestVo> getNewest() {
+        List<HistoryData> allHistoryData = getAllHistoryData();
+        int dataNum;
+        if (allHistoryData.size() >= 7) {
+            dataNum = 7;
+        } else {
+            dataNum = allHistoryData.size();
+        }
+        List<NewestVo> newestVoList = new ArrayList<>();
+        for (int i = 0; i < dataNum; i++) {
+            HistoryData historyData = allHistoryData.get(i);
+            NewestVo newestVo = new NewestVo();
+            newestVo.setId(historyData.getId());
+            newestVo.setDeviceTypeName(historyData.getDeviceTypeName());
+            newestVo.setDepth(historyData.getDepth());
+            newestVo.setPileDescribe(historyData.getPileDescribe());
+            newestVo.setTs(historyData.getTs());
+            newestVoList.add(newestVo);
+        }
+
+        return newestVoList;
     }
 
     private int getTotalPages(int size, Integer totalElements) {

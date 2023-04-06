@@ -253,7 +253,7 @@ public class ExcelUtils {
             historyData.setStandardAsh(getValue(int.class, 41, row));
             historyData.setPileTopCurrent(getValue(double.class, 42, row));
             historyData.setMaxAngle(getValue(int.class, 43, row));
-            historyData.setPileTime(getValue(int.class, 44, row));
+            historyData.setPileTime(getValue(double.class, 44, row));
             historyData.setMileNo(getValue(String.class, 45, row));
             historyData.setPartNo(getValue(String.class, 46, row));
             historyData.setMilePartNo(getValue(String.class, 47, row));

@@ -38,7 +38,7 @@ public class InitRunner implements ApplicationRunner {
         LOGGER.debug("项目初始化：刷新设备和详情map缓存");
         deviceService.getDetailAndDeviceMap();
         LOGGER.debug("项目初始化：开始定时任务");
-        schedulerUtils.startJob();
+//        schedulerUtils.startJob();
     }
 
     private void init() {

@@ -42,11 +42,11 @@ spring:
   jmx:
     enabled: false
 
-
-  data:
-    jpa:
-      repositories:
-        bootstrap-mode: lazy
+#
+#  data:
+#    jpa:
+#      repositories:
+#        bootstrap-mode: lazy
 
 server:
   port: 9095
@@ -57,9 +57,13 @@ server:
 mybatis-plus:
   mapper-locations: classpath*:mappers/*.xml
   type-enums-package: darwin.unilic.*.*.enums
+  global-config:
+    db-config:
+      # 批量插入最大数量
+      batch-insert-size: 50
 
-mybatis:
-  lazy-initialization: true
+#mybatis:
+#  lazy-initialization: false
 
 logging:
   config: classpath:log/log4j2.xml
@@ -67,7 +71,7 @@ logging:
     org:
       springframework:
         boot:
-#          autoconfigure: ERROR
+          #          autoconfigure: ERROR
           autoconfigure: DEBUG
     # mybatis-plus
     com.tensquare.base: debug

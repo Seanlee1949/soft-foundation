@@ -3,19 +3,12 @@ package com.example.boot.util.task;
 import com.example.boot.data.DataScrap;
 import com.example.boot.entity.vo.HistorysVo;
 import com.example.boot.service.impl.DeviceServiceImpl;
-import com.example.boot.util.cache.CacheManagerImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.TimerTask;
-
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
+import java.util.TimerTask;
 
 /**
  * @author lishuai
@@ -53,8 +46,9 @@ public class Scheduler extends TimerTask {
         long endTime = date.getTime();
         long startTime = endTime - (1000L * 60 * 60 * 24 * 2);
 //        long startTime = endTime - (1000L * 60 * 60 * 24 * 365L);
+        String token = "/KfKIFu+USTe4bk6MbApucs3+FWDIbDUKVCM43WXkvkXDsOKsBO5NjjphxiepCWc";
 
-        List<HistorysVo> historysVos = dataScrap.collectHistoryDataToObject(startTime/1000, endTime/1000);
+        List<HistorysVo> historysVos = dataScrap.collectHistoryDataToObject(startTime / 1000, endTime / 1000, token);
 //        1671638400  1671724800
         int index = 0;
         for (HistorysVo historysVo : historysVos) {

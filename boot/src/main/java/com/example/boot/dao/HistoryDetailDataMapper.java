@@ -17,10 +17,25 @@ import java.util.List;
 @Mapper
 public interface HistoryDetailDataMapper extends BaseMapper<HistoryDetailData> {
     @Select("select * from SF_HISTORY_DETAIL_DATA where DEVICE_KEY = #{deviceKeyTemp} AND PILE_DESCRIBE = #{pileDescribeTemp}")
-    List<HistoryDetailData> selectByDeviceKey(String deviceKeyTemp,String pileDescribeTemp);
+    List<HistoryDetailData> selectByDeviceKey(String deviceKeyTemp, String pileDescribeTemp);
+
     @Select("select ID from SF_HISTORY_DETAIL_DATA where DEVICE_KEY = #{deviceKeyTemp} AND PILE_DESCRIBE = #{pileDescribeTemp}")
-    List<String> selectIdsByDeviceKey(String deviceKeyTemp,String pileDescribeTemp);
+    List<String> selectIdsByDeviceKey(String deviceKeyTemp, String pileDescribeTemp);
 
     @Delete("delete from SF_HISTORY_DETAIL_DATA  where pile_describe = #{pileDescribe}")
     void deleteByPileDescribe(String pileDescribe);
+
+    @Select("select * from SF_HISTORY_DETAIL_DATA limit #{offset},#{limit} ")
+    List<HistoryDetailData> selectByOffset(long offset, long limit);
+
+//   default void insertBatch(List<HistoryDetailData> historyDetailDataList){
+//       QueryWrapper<HistoryDetailData> queryWrapper = new QueryWrapper<>();
+//        queryWrapper.insert(historyDetailDataList, queryWrapper);
+//    }
+
+
+    default void batchInsert(List<HistoryDetailData> historyDetailDataList) {
+
+
+    }
 }

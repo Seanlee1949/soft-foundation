@@ -16,6 +16,7 @@ public class HistoryDetailData {
     private double partDeep;
     private int partId;
     private int partPressure;
+    // 段密度
     private double partDensity;
     private double partPulp;
     private double partCurrent;

@@ -390,8 +390,16 @@ public class DeviceServiceImpl implements DeviceService {
         queryWrapper.in("KEY_", validKeyList);
         List<Record> recordList = recordMapper.selectList(queryWrapper);
         if (!StringUtils.isEmpty(deviceType)) {
-            recordList = recordList.stream().filter(record -> record.getType().equals(deviceType)).collect(Collectors.toList());
+            recordList = recordList.stream().filter(record -> record.getType().equals(deviceType))
+                    .sorted(new Comparator<Record>() {
+                        @Override
+                        public int compare(Record o1, Record o2) {
+                            return o1.getActiveAt() > o2.getActiveAt() ? 1 : -1;
+                        }
+                    })
+                    .collect(Collectors.toList());
         }
+
         int total = recordList.size();
         int pages = total % size == 0 ? total / size : total / size + 1;
 
@@ -549,12 +557,27 @@ public class DeviceServiceImpl implements DeviceService {
 
     public List<HistoryDetailData> getAllHistoryDetailData() {
 
+        int limit20000 = 50000;
         String key = "historyDetailDataListAll";
         EntityCache entityCache = CacheUtils.cacheManagerImpl.getCacheByKey(key);
         if (entityCache == null) {
-            LOGGER.debug("开始刷新缓存historyDetailDataListAll");
-            List<HistoryDetailData> historyDetailDataListAll = historyDetailDataMapper.selectList(null);
+            List<HistoryDetailData> historyDetailDataListAll = new ArrayList<>();
             CacheUtils.cacheManagerImpl.putCache(key, historyDetailDataListAll, 0);
+
+            long selectCount = historyDetailDataMapper.selectCount(null);
+            LOGGER.debug("开始刷新缓存historyDetailDataListAll,数量:{}", selectCount);
+
+            long offset = 0;
+            while (offset < selectCount) {
+                long limit = (offset + limit20000 < selectCount) ? limit20000 : selectCount - offset;
+                List<HistoryDetailData> historyDetailDataListTemp = historyDetailDataMapper.selectByOffset(offset, limit);
+                LOGGER.debug("正在刷新缓存historyDetailDataListAll，offest->{}，limit->{},selectCount->{}", offset, limit, selectCount);
+                ((List<HistoryDetailData>) CacheUtils.cacheManagerImpl.getCacheByKey(key).getDatas()).addAll(historyDetailDataListTemp);
+                offset = offset + limit20000;
+            }
+
+//            List<HistoryDetailData> historyDetailDataListAll = historyDetailDataMapper.selectList(null);
+//            CacheUtils.cacheManagerImpl.putCache(key, historyDetailDataListAll, 0);
             LOGGER.debug("刷新缓存完毕historyDetailDataListAll");
             return historyDetailDataListAll;
         } else {

@@ -22,8 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.util.*;
 
-import static com.example.boot.data.DataScrap.getDoubleRandom;
-import static com.example.boot.data.DataScrap.getLongRandom;
+import static com.example.boot.data.DataScrap.*;
 
 /**
  * 污水泵项目：
@@ -611,6 +610,9 @@ public class MockData2 {
                 historyDetailData.setPartAsh(historyDetailData.getPartPulp() * 1.6 / 1.73);
                 historyDetailData.setDeviceKey(deviceKey);
                 historyDetailData.setPileDescribe(pileNum);
+                historyDetailData.setPileKey(historyDetailData.getDeviceKey() +
+                        "-" + historyDetailData.getPileDescribe());
+
                 historyDetailDataList.add(historyDetailData);
             }
         }
@@ -688,6 +690,9 @@ public class MockData2 {
                     historyDetailData.setPartAsh(historyDetailData.getPartPulp() * 1.6 / 1.73);
                     historyDetailData.setDeviceKey(deviceKey);
                     historyDetailData.setPileDescribe(pileNum);
+
+                    historyDetailData.setPileKey(historyDetailData.getDeviceKey() +
+                            "-" + historyDetailData.getPileDescribe());
                     historyDetailDataList.add(historyDetailData);
                 }
                 continue;
@@ -740,6 +745,9 @@ public class MockData2 {
                 historyDetailData.setPartAsh(historyDetailData.getPartPulp() * 1.6 / 1.73);
                 historyDetailData.setDeviceKey(deviceKey);
                 historyDetailData.setPileDescribe(pileNum);
+
+                historyDetailData.setPileKey(historyDetailData.getDeviceKey() +
+                        "-" + historyDetailData.getPileDescribe());
                 historyDetailDataList.add(historyDetailData);
             }
         }
@@ -834,7 +842,7 @@ public class MockData2 {
     private static double[] getDoubleDataBySum(int dataCount, double sum, double offset) {
         double[] resultArray = new double[dataCount];
 
-        double average = sum / dataCount;
+        double average = keepDouble2(sum / dataCount);
 //        double d = dataCount / 2.0;
 //        int firstArrayLength = (d == 0) ? (dataCount / 2) : (dataCount / 2 + 1);
         int firstArrayLength = dataCount / 2;

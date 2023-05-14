@@ -92,10 +92,8 @@ public class MockDataController {
     @GetMapping("updateHistoryData3")
     public String updateHistoryData() {
         LocalDate startDate = LocalDate.of(2022, 10, 11);
-//        LocalDate startDate = LocalDate.of(2023, 3, 1);
         long startTime = startDate.atTime(0, 0, 0).toLocalDate().atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
-//        Date startDate = new Date(2022, Calendar.NOVEMBER, 11, 0, 0, 0);
-        LocalDate endDate = LocalDate.of(2023, 4, 8);
+        LocalDate endDate = LocalDate.of(2023, 5, 11);
         long endTime = endDate.atTime(0, 0, 0).toLocalDate().atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
 //
 
@@ -562,6 +560,9 @@ public class MockDataController {
                     historyDetailData.setPartAsh(historyDetailData.getPartPulp() * 1.6 / 1.73);
                     historyDetailData.setDeviceKey(deviceKey);
                     historyDetailData.setPileDescribe(pileNum);
+
+                    historyDetailData.setPileKey(historyDetailData.getDeviceKey() +
+                            "-" + historyDetailData.getPileDescribe());
                     historyDetailDataList.add(historyDetailData);
 
                 }
@@ -589,6 +590,9 @@ public class MockDataController {
                     historyDetailData.setPartAsh(historyDetailData.getPartPulp() * 1.6 / 1.73);
                     historyDetailData.setDeviceKey(deviceKey);
                     historyDetailData.setPileDescribe(pileNum);
+
+                    historyDetailData.setPileKey(historyDetailData.getDeviceKey() +
+                            "-" + historyDetailData.getPileDescribe());
                     historyDetailDataList.add(historyDetailData);
                 }
             }

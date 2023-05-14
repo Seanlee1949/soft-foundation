@@ -23,6 +23,7 @@ public class HistoryDetailData {
     private double partAsh;
     private String deviceKey;
     private String pileDescribe;
+    private String pileKey;
 
     public void setPartTime(int partTime) {
         this.partTime = partTime;
@@ -118,5 +119,13 @@ public class HistoryDetailData {
 
     public void setPileDescribe(String pileDescribe) {
         this.pileDescribe = pileDescribe;
+    }
+
+    public String getPileKey() {
+        return pileKey;
+    }
+
+    public void setPileKey(String pileKey) {
+        this.pileKey = pileKey;
     }
 }

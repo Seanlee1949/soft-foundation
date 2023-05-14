@@ -10,6 +10,7 @@ import com.example.boot.entity.dto.Record;
 import com.example.boot.entity.vo.DeviceResponse;
 import com.example.boot.entity.vo.DeviceResult;
 import com.example.boot.entity.vo.HistorysVo;
+import com.example.boot.util.CommonUtils;
 import com.example.boot.util.FileUtils;
 import com.example.boot.util.JsonUtils;
 import org.slf4j.Logger;
@@ -103,6 +104,7 @@ public class DataScrap {
                 historyDetailDataCount++;
                 historyDetailData.setDeviceKey(deviceKey);
                 historyDetailData.setPileDescribe(pileDescribe);
+                historyDetailData.setPileKey(deviceKey + "-" + pileDescribe);
                 historyDetailDataMapper.insert(historyDetailData);
 
                 System.out.printf("lineCount->%s,HistoryDataCount->%s,historyDetailDataCount->%s%n",
@@ -114,49 +116,51 @@ public class DataScrap {
     }
 
     public void dealHistoryVoAndInsertOrUpdate(int lineCount, HistorysVo historysVo, boolean updateRepeat) {
-
         List<HistoryData> historyDataList = historysVo.getContent();
-        LOGGER.debug("插入第{}行数据,historyData->{}", lineCount, historyDataList.size());
+        LOGGER.debug("插入第{}页 数据,historyData->{}", lineCount, historyDataList.size());
+
         for (HistoryData historyData : historyDataList) {
             historyDataCount++;
             {
                 HistoryData historyDataTemp = historyDataMapper.selectById(historyData.getId());
                 if (historyDataTemp != null) {
-
-                    if (updateRepeat) {
+                    if (!updateRepeat) {
+                        // 重复的不处理
+                        LOGGER.info("重复，不处理");
+                        continue;
+                    } else {
+                        LOGGER.info("重复，先删除");
                         historyDataMapper.deleteById(historyData.getId());
                         historyDetailDataMapper.deleteByPileDescribe(historyData.getPileDescribe());
-                    } else {
-                        // 重复的不处理
-                        continue;
                     }
                 }
             }
 
-            historyDataMapper.insert(historyData);
             String deviceKey = historyData.getDeviceKey();
             String pileDescribe = historyData.getPileDescribe();
             List<HistoryDetailData> historyDetailDataList = historyData.getData();
-            LOGGER.debug("插入第{}行数据,累计第{}条 历史数据，历史数据详情{}条",
+            LOGGER.debug("插入第{}页数据,累计第{}条 历史数据，历史数据详情{}条",
                     lineCount, historyDataCount, historyDetailDataList.size());
 
-            // 排序
+            // 段数据排序
             historyDetailDataList.sort(Comparator.comparingInt(HistoryDetailData::getPartId));
 
             Double doubleRandom = 0.0;
             // 处理随机数 : 庆平路
 //            dealWithRandomNumber(historyDetailDataList, doubleRandom);
             // 处理随机数：沙涌路
-//            dealWithRandomNumber3(historyDetailDataList, doubleRandom);
+            dealWithRandomNumber3(historyDetailDataList, doubleRandom);
+            dealWithRandomData3(historyData);
 
 
             for (HistoryDetailData historyDetailData : historyDetailDataList) {
                 historyDetailDataCount++;
+                historyDetailData.setId(CommonUtils.getUUID());
                 historyDetailData.setDeviceKey(deviceKey);
                 historyDetailData.setPileDescribe(pileDescribe);
-                // todo
-//                historyDetailDataMapper.insert(historyDetailData);
+                historyDetailData.setPileKey(deviceKey + "-" + pileDescribe);
             }
+            historyDataMapper.insert(historyData);
             historyDetailDataService.batchInsert(historyDetailDataList);
             System.out.printf("lineCount->%s,HistoryDataCount->%s,historyDetailDataCount->%s%n",
                     lineCount,
@@ -177,10 +181,18 @@ public class DataScrap {
      * 密度值修改为1.72至1.75之间浮动
      */
     private void dealWithRandomData3(HistoryData historyData) {
+        double minDown = 74;
+        double maxDown = 80;
+        double minUp = 76;
+        double maxUp = 80;
         historyData.setWaterCementRatio(getDoubleRandom(0.56, 0.59));
         historyData.setXAngle(getDoubleRandom(0.2, 0.8));
         historyData.setYAngle(getDoubleRandom(0.2, 0.8));
 
+        historyData.setUpSpeed(getDoubleRandom(minUp, maxUp));
+        historyData.setDownSpeed(getDoubleRandom(minDown, maxDown));
+        historyData.setMaxUpSpeed(getDoubleRandom(maxUp - 1, maxUp));
+        historyData.setMaxDownSpeed(getDoubleRandom(maxDown - 1, maxDown));
     }
 
     /**
@@ -198,39 +210,58 @@ public class DataScrap {
      * @param doubleRandom
      */
     private void dealWithRandomNumber3(List<HistoryDetailData> historyDetailDataList, Double doubleRandom) {
+        double minDown = 74;
+        double maxDown = 80;
+        double minUp = 76;
+        double maxUp = 80;
+
         for (int i = 0; i < historyDetailDataList.size(); i++) {
             HistoryDetailData historyDetailDataTemp = historyDetailDataList.get(i);
-
+            // 第一个数据
             if (i == 0) {
-                {
-                    // 处理随机数
-                    if (historyDetailDataTemp.getPartDownSpeed() > 0) {
-                        doubleRandom = getDoubleRandom(74, 80);
-                        historyDetailDataTemp.setPartDownSpeed(getDoubleRandom(74, 80));
-                    } else if (historyDetailDataTemp.getPartDownSpeed() < 0) {
-                        historyDetailDataTemp.setPartDownSpeed(-getDoubleRandom(76, 81));
-                        doubleRandom = getDoubleRandom(76, 81);
-                    }
-                }
+                doubleRandom = dealWithDetailData0(doubleRandom, minDown, maxDown, minUp, maxUp, historyDetailDataTemp);
                 continue;
             }
-            if (historyDetailDataList.get(i - 1).getPartDownSpeed() < 0
-                    && historyDetailDataList.get(i).getPartDownSpeed() > 0) {
-                doubleRandom = getDoubleRandom(74, 80);
-            }
-            if (historyDetailDataList.get(i - 1).getPartDownSpeed() > 0
-                    && historyDetailDataList.get(i).getPartDownSpeed() < 0) {
-                doubleRandom = getDoubleRandom(76, 81);
-            }
+            doubleRandom = getPileSpeed(historyDetailDataList, doubleRandom, minDown, maxDown, minUp, maxUp, i);
             if (historyDetailDataTemp.getPartDownSpeed() > 0) {
+                // 下钻处理
                 historyDetailDataTemp.setPartDownSpeed(getDoubleRandom(doubleRandom - 1, doubleRandom + 1));
             } else if (historyDetailDataTemp.getPartDownSpeed() < 0) {
+                // 提钻处理
                 historyDetailDataTemp.setPartDownSpeed(-getDoubleRandom(doubleRandom - 1, doubleRandom + 1));
             }
-
             // 密度
             historyDetailDataTemp.setPartDensity(getDoubleRandom(1.72, 1.75));
         }
+    }
+
+    private Double getPileSpeed(List<HistoryDetailData> historyDetailDataList, Double doubleRandom, double minDown, double maxDown, double minUp, double maxUp, int i) {
+        // 由提钻切换为下钻
+        if (historyDetailDataList.get(i - 1).getPartDownSpeed() < 0
+                && historyDetailDataList.get(i).getPartDownSpeed() > 0) {
+            doubleRandom = getDoubleRandom(minDown + 1, maxDown - 1);
+        }
+        // 由下钻切换为提钻
+        if (historyDetailDataList.get(i - 1).getPartDownSpeed() > 0
+                && historyDetailDataList.get(i).getPartDownSpeed() < 0) {
+            doubleRandom = getDoubleRandom(minUp + 1, maxUp - 1);
+        }
+        return doubleRandom;
+    }
+
+    private Double dealWithDetailData0(Double doubleRandom, double minDown, double maxDown, double minUp, double maxUp,
+                                       HistoryDetailData historyDetailDataTemp) {
+        {
+            // 处理随机数
+            if (historyDetailDataTemp.getPartDownSpeed() > 0) {
+                doubleRandom = getDoubleRandom(minDown + 1, maxDown - 1);
+                historyDetailDataTemp.setPartDownSpeed(getDoubleRandom(minDown + 1, maxDown - 1));
+            } else if (historyDetailDataTemp.getPartDownSpeed() < 0) {
+                doubleRandom = getDoubleRandom(minUp + 1, maxUp - 1);
+                historyDetailDataTemp.setPartDownSpeed(-getDoubleRandom(minUp + 1, maxUp - 1));
+            }
+        }
+        return doubleRandom;
     }
 
     private void dealWithRandomNumber(List<HistoryDetailData> historyDetailDataList, Double doubleRandom) {
@@ -275,7 +306,15 @@ public class DataScrap {
         Random rand = new Random();
         double result = 0;
         result = min + (rand.nextDouble() * (max - min));
-        return result;
+
+        double result2 = Math.round(result * 100.0) / 100.0;
+
+//        return result;
+        return result2;
+    }
+
+    public static double keepDouble2(double d) {
+        return Math.round(d * 100.0) / 100.0;
     }
 
     /**

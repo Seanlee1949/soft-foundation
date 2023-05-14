@@ -4,7 +4,7 @@ spring:
     #驱动
     driver-class-name: org.h2.Driver
     #配置h2数据库的连接地址
-    url: jdbc:h2:./database/sf_data
+    url: jdbc:h2:./database/sf_data;COMPRESS=TRUE
     #用户名
     username: root
     #密码
@@ -23,7 +23,10 @@ spring:
         - classpath: static
     mvc:
       static-path-pattern: /**
-  #      file:./static
+
+
+
+    maximum-pool-size=20:  #      file:./static
   #      file
   #H2数据库web访问配置
   h2:
@@ -49,7 +52,7 @@ spring:
 #        bootstrap-mode: lazy
 
 server:
-  port: 9095
+  port: 9096
   servlet:
     #应用上下文
     context-path: /

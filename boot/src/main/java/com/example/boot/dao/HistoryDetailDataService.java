@@ -19,7 +19,7 @@ public class HistoryDetailDataService {
 
     public void batchInsert(List<HistoryDetailData> historyDetailDataList) {
 
-        jdbcTemplate.batchUpdate("insert into SF_HISTORY_DETAIL_DATA values(?,?,?,?,?,?,?,?,?,?,?,?)",
+        jdbcTemplate.batchUpdate("insert into SF_HISTORY_DETAIL_DATA values(?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 historyDetailDataList.stream().map(historyDetailData -> {
                     return new Object[]{
                             historyDetailData.getId(),
@@ -33,7 +33,8 @@ public class HistoryDetailDataService {
                             historyDetailData.getPartCurrent(),
                             historyDetailData.getPartAsh(),
                             historyDetailData.getDeviceKey(),
-                            historyDetailData.getPileDescribe()
+                            historyDetailData.getPileDescribe(),
+                            historyDetailData.getPileKey()
                     };
                 }).collect(Collectors.toList()));
     }

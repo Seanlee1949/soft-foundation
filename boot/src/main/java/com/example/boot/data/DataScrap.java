@@ -104,7 +104,8 @@ public class DataScrap {
                 historyDetailDataCount++;
                 historyDetailData.setDeviceKey(deviceKey);
                 historyDetailData.setPileDescribe(pileDescribe);
-                historyDetailData.setPileKey(deviceKey + "-" + pileDescribe);
+//                historyDetailData.setPileKey(deviceKey + "-" + pileDescribe);
+                historyDetailData.setPileKey(historyData.getId());
                 historyDetailDataMapper.insert(historyDetailData);
 
                 System.out.printf("lineCount->%s,HistoryDataCount->%s,historyDetailDataCount->%s%n",
@@ -149,8 +150,8 @@ public class DataScrap {
             // 处理随机数 : 庆平路
 //            dealWithRandomNumber(historyDetailDataList, doubleRandom);
             // 处理随机数：沙涌路
-            dealWithRandomNumber3(historyDetailDataList, doubleRandom);
-            dealWithRandomData3(historyData);
+//            dealWithRandomNumber3(historyDetailDataList, doubleRandom);
+//            dealWithRandomData3(historyData);
 
 
             for (HistoryDetailData historyDetailData : historyDetailDataList) {
@@ -158,7 +159,8 @@ public class DataScrap {
                 historyDetailData.setId(CommonUtils.getUUID());
                 historyDetailData.setDeviceKey(deviceKey);
                 historyDetailData.setPileDescribe(pileDescribe);
-                historyDetailData.setPileKey(deviceKey + "-" + pileDescribe);
+//                historyDetailData.setPileKey(deviceKey + "-" + pileDescribe);
+                historyDetailData.setPileKey(historyData.getId());
             }
             historyDataMapper.insert(historyData);
             historyDetailDataService.batchInsert(historyDetailDataList);

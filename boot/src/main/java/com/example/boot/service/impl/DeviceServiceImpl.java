@@ -238,7 +238,8 @@ public class DeviceServiceImpl implements DeviceService {
                 // pileDescribe
                 .filter(historyData -> {
                     if (!StringUtils.isEmpty(pileDescribe)) {
-                        return historyData.getPileDescribe().equals(pileDescribe);
+                        // 包含桩号即可
+                        return historyData.getPileDescribe().contains(pileDescribe);
                     } else {
                         return true;
                     }
@@ -344,9 +345,10 @@ public class DeviceServiceImpl implements DeviceService {
             CompletableFuture<Void> voidCompletableFuture = CompletableFuture.runAsync(new Runnable() {
                 @Override
                 public void run() {
-                    String deviceKeyTemp = historyData.getDeviceKey();
-                    String pileDescribeTemp = historyData.getPileDescribe();
-                    String identifier = deviceKeyTemp + "-" + pileDescribeTemp;
+//                    String deviceKeyTemp = historyData.getDeviceKey();
+//                    String pileDescribeTemp = historyData.getPileDescribe();
+//                    String identifier = deviceKeyTemp + "-" + pileDescribeTemp;
+                    String identifier = historyData.getId();
                     List<HistoryDetailData> historyDetailDataList = detailAndDeviceMap.get(identifier);
 //                    List<HistoryDetailData> historyDetailDataList = getHistoryDetailDataList(deviceKeyTemp, pileDescribeTemp);
 //            List<HistoryDetailData> historyDetailDataList = historyDetailDataListAll.stream().filter(historyDetailData -> {
@@ -393,11 +395,12 @@ public class DeviceServiceImpl implements DeviceService {
     private Map<String, List<HistoryDetailData>> getDetailAndDeviceMap(List<HistoryData> content) {
         List<String> pileKeyList = new ArrayList<>();
         for (HistoryData historyData : content) {
-            String deviceKey = historyData.getDeviceKey();
-            String pileDescribe = historyData.getPileDescribe();
-            String pileKey = deviceKey + "-" + pileDescribe;
-            if (!pileKeyList.contains(pileKey)) {
-                pileKeyList.add(pileKey);
+//            String deviceKey = historyData.getDeviceKey();
+//            String pileDescribe = historyData.getPileDescribe();
+            String pileId = historyData.getId();
+//            String pileKey = deviceKey + "-" + pileDescribe;
+            if (!pileKeyList.contains(pileId)) {
+                pileKeyList.add(pileId);
             }
         }
         QueryWrapper<HistoryDetailData> queryWrapper = new QueryWrapper<>();
@@ -408,7 +411,8 @@ public class DeviceServiceImpl implements DeviceService {
         // todo
         List<HistoryDetailData> allHistoryDetailData = historyDetailDataMapper.selectList(queryWrapper);
         for (HistoryDetailData historyDetailData : allHistoryDetailData) {
-            String identifier = historyDetailData.getDeviceKey() + "-" + historyDetailData.getPileDescribe();
+//            String identifier = historyDetailData.getDeviceKey() + "-" + historyDetailData.getPileDescribe();
+            String identifier = historyDetailData.getPileKey();
 
             List<HistoryDetailData> temp = deviceIdentifierAndDetailMap.get(identifier);
             if (temp == null) {
@@ -684,36 +688,36 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
 
-    public Map<String, List<HistoryDetailData>> getDetailAndDeviceMap() {
-        String key = "deviceIdentifierAndDetailMap";
-        EntityCache entityCache = CacheUtils.cacheManagerImpl.getCacheByKey(key);
-        if (entityCache == null) {
-            LOGGER.debug("开始刷新缓存deviceIdentifierAndDetailMap");
-            Map<String, List<HistoryDetailData>> deviceIdentifierAndDetailMap = new LinkedHashMap<>();
-            // todo
-            List<HistoryDetailData> allHistoryDetailData = getAllHistoryDetailData();
-            for (HistoryDetailData historyDetailData : allHistoryDetailData) {
-                String identifier = historyDetailData.getDeviceKey() + "-" + historyDetailData.getPileDescribe();
-
-                List<HistoryDetailData> temp = deviceIdentifierAndDetailMap.get(identifier);
-                if (temp == null) {
-                    List<HistoryDetailData> historyDetailDataList = new ArrayList<>();
-                    historyDetailDataList.add(historyDetailData);
-                    deviceIdentifierAndDetailMap.put(identifier, historyDetailDataList);
-
-                } else {
-
-                    temp.add(historyDetailData);
-                }
-            }
-            CacheUtils.cacheManagerImpl.putCache(key, deviceIdentifierAndDetailMap, 0);
-            LOGGER.debug("刷新缓存完毕deviceIdentifierAndDetailMap");
-            return deviceIdentifierAndDetailMap;
-        } else {
-            LOGGER.debug("获取缓存数据deviceIdentifierAndDetailMap");
-            return (Map<String, List<HistoryDetailData>>) entityCache.getDatas();
-        }
-    }
+//    public Map<String, List<HistoryDetailData>> getDetailAndDeviceMap() {
+//        String key = "deviceIdentifierAndDetailMap";
+//        EntityCache entityCache = CacheUtils.cacheManagerImpl.getCacheByKey(key);
+//        if (entityCache == null) {
+//            LOGGER.debug("开始刷新缓存deviceIdentifierAndDetailMap");
+//            Map<String, List<HistoryDetailData>> deviceIdentifierAndDetailMap = new LinkedHashMap<>();
+//            // todo
+//            List<HistoryDetailData> allHistoryDetailData = getAllHistoryDetailData();
+//            for (HistoryDetailData historyDetailData : allHistoryDetailData) {
+//                String identifier = historyDetailData.getDeviceKey() + "-" + historyDetailData.getPileDescribe();
+//
+//                List<HistoryDetailData> temp = deviceIdentifierAndDetailMap.get(identifier);
+//                if (temp == null) {
+//                    List<HistoryDetailData> historyDetailDataList = new ArrayList<>();
+//                    historyDetailDataList.add(historyDetailData);
+//                    deviceIdentifierAndDetailMap.put(identifier, historyDetailDataList);
+//
+//                } else {
+//
+//                    temp.add(historyDetailData);
+//                }
+//            }
+//            CacheUtils.cacheManagerImpl.putCache(key, deviceIdentifierAndDetailMap, 0);
+//            LOGGER.debug("刷新缓存完毕deviceIdentifierAndDetailMap");
+//            return deviceIdentifierAndDetailMap;
+//        } else {
+//            LOGGER.debug("获取缓存数据deviceIdentifierAndDetailMap");
+//            return (Map<String, List<HistoryDetailData>>) entityCache.getDatas();
+//        }
+//    }
 
     public List<HistoryData> getAllHistoryData() {
         String key = "historyDataAll";

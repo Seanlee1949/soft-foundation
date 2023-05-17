@@ -52,7 +52,7 @@ spring:
 #        bootstrap-mode: lazy
 
 server:
-  port: 9096
+  port: 9095
   servlet:
     #应用上下文
     context-path: /

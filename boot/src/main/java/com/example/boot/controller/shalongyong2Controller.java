@@ -82,7 +82,7 @@ public class shalongyong2Controller {
         for (HistorysVo historysVo : historysVos) {
             // 循环每一页,每页10条数据
             pageCount++;
-            dataScrap.dealHistoryVoAndInsertOrUpdate(pageCount, historysVo, true);
+            dataScrap.dealHistoryVoAndInsertOrUpdate(pageCount, historysVo, false);
         }
         // 刷新缓存
         deviceService.refreshCache();

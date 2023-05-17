@@ -6,7 +6,6 @@ import com.example.boot.entity.dto.HistoryDetailData;
 import com.example.boot.entity.vo.HistorysVo;
 import com.example.boot.service.impl.DeviceServiceImpl;
 import com.example.boot.util.CommonUtils;
-import com.example.boot.util.FileUtils;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -128,40 +127,40 @@ public class MockData3 {
 
 
     //    @GetMapping("/update-history-data")
-    public void updateHistoryDataByFile() {
-        String deviceKey = "MX01808023020020";
-        String path1 = "C:\\Users\\25455\\Desktop\\1111.csv";
-        String path2 = "C:\\Users\\25455\\Desktop\\2222.csv";
-        List<String> lines1 = FileUtils.readFileByLine(path1);
-        List<String> lines2 = FileUtils.readFileByLine(path2);
-//        List<String> lines = FileUtils.readFileByLine("C:\\Users\\25455\\Desktop\\test.txt");
-
-        {
-            String pieDiscribe = "444";
-            long beginTime = 1662250500L;//2022-09.04 08:15   单位S
-            long endTime = 1662254760L;//2022-09.04 09:26:00        单位S
-            dealFirstLine(deviceKey, lines1, pieDiscribe, beginTime, endTime);
-
-        }
+//    public void updateHistoryDataByFile() {
+//        String deviceKey = "MX01808023020020";
+//        String path1 = "C:\\Users\\25455\\Desktop\\1111.csv";
+//        String path2 = "C:\\Users\\25455\\Desktop\\2222.csv";
+//        List<String> lines1 = FileUtils.readFileByLine(path1);
+//        List<String> lines2 = FileUtils.readFileByLine(path2);
+////        List<String> lines = FileUtils.readFileByLine("C:\\Users\\25455\\Desktop\\test.txt");
+//
 //        {
-//            String pieDiscribe = "427";
-//            long beginTime = 1662255000L;//2022-09.04 09:30:00      单位S
-//            long endTime = 1662259200L;//2022-09.04 10:40:00        单位S
-//            dealFirstLine(deviceKey, lines2, pieDiscribe, beginTime, endTime);
+//            String pieDiscribe = "444";
+//            long beginTime = 1662250500L;//2022-09.04 08:15   单位S
+//            long endTime = 1662254760L;//2022-09.04 09:26:00        单位S
+//            dealFirstLine(deviceKey, lines1, pieDiscribe, beginTime, endTime);
+//
 //        }
-        deviceService.refreshCache();
-    }
+////        {
+////            String pieDiscribe = "427";
+////            long beginTime = 1662255000L;//2022-09.04 09:30:00      单位S
+////            long endTime = 1662259200L;//2022-09.04 10:40:00        单位S
+////            dealFirstLine(deviceKey, lines2, pieDiscribe, beginTime, endTime);
+////        }
+//        deviceService.refreshCache();
+//    }
 
     private HistoryData dealPiceOfData(String deviceKey, String pileNum, List<XSSFRow> onePileData) {
         // 声明全局变量
-
+        String id = CommonUtils.getUUID();
 
         String pieDiscribe = pileNum;
         // 总共四行： 第一次下降，第一次上升，第二次下降，第二次上升
 
         // 获取详情数据
         List<HistoryDetailData> historyDetailDataList =
-                getHistoryDetailData(deviceKey, onePileData, pileNum);
+                getHistoryDetailData(deviceKey, onePileData, pileNum, id);
 
         String[] fistDownArray = changeCellsToStringArray(onePileData.get(0));
         String[] firstUp = changeCellsToStringArray(onePileData.get(1));
@@ -175,7 +174,7 @@ public class MockData3 {
                 Double.parseDouble(secondDown[pileTimeIndex]) +
                 Double.parseDouble(secondUp[pileTimeIndex]);
         HistoryData historyData = new HistoryData();
-        historyData.set_id(CommonUtils.getUUID());
+        historyData.set_id(id);
         historyData.setData(historyDetailDataList);
         historyData.setPackageAmount(Integer.parseInt(pieDiscribe.replace("#", "")));
         historyData.setPileId(Integer.parseInt(pieDiscribe.replace("#", "")));
@@ -272,7 +271,7 @@ public class MockData3 {
 
     }
 
-    private List<HistoryDetailData> getHistoryDetailData(String deviceKey, List<XSSFRow> onePileData, String pileNum) {
+    private List<HistoryDetailData> getHistoryDetailData(String deviceKey, List<XSSFRow> onePileData, String pileNum, String id) {
         String[] fistDownArray = changeCellsToStringArray(onePileData.get(0));
         String[] firstUp = changeCellsToStringArray(onePileData.get(1));
         String[] secondDown = changeCellsToStringArray(onePileData.get(2));
@@ -283,16 +282,16 @@ public class MockData3 {
 
         if (onePileData.get(0).getSheet().getSheetName().contains("10m")) {
 
-            dealWithFirst10(deviceKey, fistDownArray, pileNum, 1, historyDetailDataList);
-            dealWithFirst10(deviceKey, firstUp, pileNum, -1, historyDetailDataList);
-            dealWithFirst10(deviceKey, secondDown, pileNum, 1, historyDetailDataList);
-            dealWithFirst10(deviceKey, secondUp, pileNum, -1, historyDetailDataList);
+            dealWithFirst10(deviceKey, fistDownArray, pileNum, 1, historyDetailDataList, id);
+            dealWithFirst10(deviceKey, firstUp, pileNum, -1, historyDetailDataList, id);
+            dealWithFirst10(deviceKey, secondDown, pileNum, 1, historyDetailDataList, id);
+            dealWithFirst10(deviceKey, secondUp, pileNum, -1, historyDetailDataList, id);
         } else {
 
-            dealWithFirst(deviceKey, fistDownArray, pileNum, 1, historyDetailDataList);
-            dealWithFirst(deviceKey, firstUp, pileNum, -1, historyDetailDataList);
-            dealWithFirst(deviceKey, secondDown, pileNum, 1, historyDetailDataList);
-            dealWithFirst(deviceKey, secondUp, pileNum, -1, historyDetailDataList);
+            dealWithFirst(deviceKey, fistDownArray, pileNum, 1, historyDetailDataList, id);
+            dealWithFirst(deviceKey, firstUp, pileNum, -1, historyDetailDataList, id);
+            dealWithFirst(deviceKey, secondDown, pileNum, 1, historyDetailDataList, id);
+            dealWithFirst(deviceKey, secondUp, pileNum, -1, historyDetailDataList, id);
         }
         return historyDetailDataList;
     }
@@ -310,6 +309,7 @@ public class MockData3 {
         }
         return aLinelist.toArray(new String[0]);
     }
+/*
 
     private void dealFirstLine(String deviceKey, List<String> lines, String pieDiscribe, long beginTime, long endTime) {
         // 循环所有行
@@ -331,13 +331,13 @@ public class MockData3 {
                 List<HistoryDetailData> historyDetailDataList = new ArrayList<>();
                 // 处理第一次下降
                 int partId = 0;
-                dealWithFirst(deviceKey, splits1, pileNum, 1, historyDetailDataList);
+                dealWithFirst(deviceKey, splits1, pileNum, 1, historyDetailDataList, id);
                 String[] splits2 = firstUp.split(",");
-                dealWithFirst(deviceKey, splits2, pileNum, -1, historyDetailDataList);
+                dealWithFirst(deviceKey, splits2, pileNum, -1, historyDetailDataList, id);
                 String[] splits3 = secondDown.split(",");
-                dealWithFirst(deviceKey, splits3, pileNum, 1, historyDetailDataList);
+                dealWithFirst(deviceKey, splits3, pileNum, 1, historyDetailDataList, id);
                 String[] splits4 = secondUp.split(",");
-                dealWithFirst(deviceKey, splits4, pileNum, -1, historyDetailDataList);
+                dealWithFirst(deviceKey, splits4, pileNum, -1, historyDetailDataList, id);
 
                 double pileTime = Double.parseDouble(splits1[48]) +
                         Double.parseDouble(splits2[48]) +
@@ -428,6 +428,7 @@ public class MockData3 {
             }
         }
     }
+*/
 
     {
 //            for (String line : lines) {
@@ -468,7 +469,7 @@ public class MockData3 {
     }
 
     private List<HistoryDetailData> dealWithFirst10(String deviceKey, String[] oneTimeDetailDataArray, String pileNum,
-                                                    int direection, List<HistoryDetailData> historyDetailDataList) {
+                                                    int direection, List<HistoryDetailData> historyDetailDataList, String id) {
 
 
         double partDeep;
@@ -535,8 +536,8 @@ public class MockData3 {
                 historyDetailData.setDeviceKey(deviceKey);
                 historyDetailData.setPileDescribe(pileNum);
 
-                historyDetailData.setPileKey(historyDetailData.getDeviceKey() +
-                        "-" + historyDetailData.getPileDescribe());
+//                historyDetailData.setPileKey(historyDetailData.getDeviceKey() + "-" + historyDetailData.getPileDescribe());
+                historyDetailData.setPileKey(id);
                 historyDetailDataList.add(historyDetailData);
             }
         }
@@ -546,7 +547,7 @@ public class MockData3 {
     }
 
     private List<HistoryDetailData> dealWithFirst(String deviceKey, String[] oneTimeDetailDataArray, String pileNum,
-                                                  int direection, List<HistoryDetailData> historyDetailDataList) {
+                                                  int direection, List<HistoryDetailData> historyDetailDataList, String id) {
 
 
         double partDeep;
@@ -615,8 +616,8 @@ public class MockData3 {
                     historyDetailData.setDeviceKey(deviceKey);
                     historyDetailData.setPileDescribe(pileNum);
 
-                    historyDetailData.setPileKey(historyDetailData.getDeviceKey() +
-                            "-" + historyDetailData.getPileDescribe());
+//                    historyDetailData.setPileKey(historyDetailData.getDeviceKey() + "-" + historyDetailData.getPileDescribe());
+                    historyDetailData.setPileKey(id);
                     historyDetailDataList.add(historyDetailData);
                 }
                 continue;
@@ -670,8 +671,8 @@ public class MockData3 {
                 historyDetailData.setDeviceKey(deviceKey);
                 historyDetailData.setPileDescribe(pileNum);
 
-                historyDetailData.setPileKey(historyDetailData.getDeviceKey() +
-                        "-" + historyDetailData.getPileDescribe());
+                historyDetailData.setPileKey(id);
+//                historyDetailData.setPileKey(historyDetailData.getDeviceKey() + "-" + historyDetailData.getPileDescribe());
                 historyDetailDataList.add(historyDetailData);
             }
         }

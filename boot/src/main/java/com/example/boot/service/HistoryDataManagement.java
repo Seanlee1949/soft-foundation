@@ -33,6 +33,12 @@ public class HistoryDataManagement {
         List<HistoryDetailData> historyDetailDataList = historyDetailDataMapper.selectList(queryWrapper);
         historyData.setData(historyDetailDataList);
         return historyData;
+    }
 
+    public void deleteHistoryDataById(String id) {
+        historyDataMapper.deleteById(id);
+        QueryWrapper<HistoryDetailData> queryWrapper = new QueryWrapper();
+        queryWrapper.eq("PILE_KEY", id);
+        historyDetailDataMapper.delete(queryWrapper);
     }
 }

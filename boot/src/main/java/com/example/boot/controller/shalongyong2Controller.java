@@ -1,15 +1,18 @@
 package com.example.boot.controller;
 
 import com.example.boot.constant.CommonConstant;
-import com.example.boot.dao.HistoryDataMapper;
 import com.example.boot.dao.HistoryDetailDataMapper;
 import com.example.boot.dao.RecordMapper;
 import com.example.boot.data.DataScrap;
 import com.example.boot.data.HttpRequest;
+import com.example.boot.entity.dto.HistoryData;
+import com.example.boot.entity.dto.HistoryDetailData;
 import com.example.boot.entity.dto.Record;
 import com.example.boot.entity.vo.DeviceResponse;
 import com.example.boot.entity.vo.HistorysVo;
+import com.example.boot.service.HistoryDataManagement;
 import com.example.boot.service.impl.DeviceServiceImpl;
+import com.example.boot.util.CommonUtils;
 import com.example.boot.util.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,13 +62,26 @@ public class shalongyong2Controller {
     private HistoryDetailDataMapper historyDetailDataMapper;
 
     @Autowired
-    private HistoryDataMapper historyDataMapper;
+    HistoryDataManagement historyDataManagement;
 
     @GetMapping("/updata-one-data")
     public String updateOneDataById() {
-//        historyDataMapper.sele.
+        String idToFix = "";
+        String replaceDataId = "";
+        HistoryData historyDataFix = historyDataManagement.queryHistoryDataById(idToFix);
+        HistoryData historyDataReplaced = historyDataManagement.queryHistoryDataById(replaceDataId);
 
+        for (HistoryDetailData historyDetailData : historyDataReplaced.getData()) {
+            historyDetailData.setId(CommonUtils.getUUID());
+            historyDetailData.setPileKey(historyDataFix.getId());
+            historyDetailData.setDeviceKey(historyDataFix.getDeviceKey());
+            historyDetailData.setPileDescribe(historyDataFix.getPileDescribe());
+        }
+        historyDataFix.setData(historyDataReplaced.getData());
+        historyDataManagement.deleteHistoryDataById(idToFix);
+        historyDataManagement.insertHistory(historyDataFix);
 
+        return CommonConstant.SUCCESS;
     }
 
     /**

@@ -79,6 +79,14 @@ public class HistoryData {
         return id;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public void setPackageAmount(int packageAmount) {
         this.packageAmount = packageAmount;
     }
@@ -471,11 +479,4 @@ public class HistoryData {
         return data;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
 }

@@ -1,6 +1,8 @@
 package com.example.boot.controller;
 
 import com.example.boot.constant.CommonConstant;
+import com.example.boot.dao.HistoryDataMapper;
+import com.example.boot.dao.HistoryDetailDataMapper;
 import com.example.boot.dao.RecordMapper;
 import com.example.boot.data.DataScrap;
 import com.example.boot.data.HttpRequest;
@@ -53,6 +55,18 @@ public class shalongyong2Controller {
     private DeviceServiceImpl deviceService;
     @Autowired
     private RecordMapper recordMapper;
+    @Autowired
+    private HistoryDetailDataMapper historyDetailDataMapper;
+
+    @Autowired
+    private HistoryDataMapper historyDataMapper;
+
+    @GetMapping("/updata-one-data")
+    public String updateOneDataById() {
+//        historyDataMapper.sele.
+
+
+    }
 
     /**
      * 账号

@@ -3,9 +3,7 @@ package com.example.boot.common;
 import org.apache.logging.log4j.ThreadContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
-import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.Cookie;
@@ -21,7 +19,6 @@ import static com.example.boot.constant.CommonConstant.USER_NAME;
  */
 public class CookiendSessionInterceptor implements AsyncHandlerInterceptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(CookiendSessionInterceptor.class);
-
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {

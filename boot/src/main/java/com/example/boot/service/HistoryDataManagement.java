@@ -3,6 +3,7 @@ package com.example.boot.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.boot.dao.HistoryDataMapper;
 import com.example.boot.dao.HistoryDetailDataMapper;
+import com.example.boot.dao.HistoryDetailDataService;
 import com.example.boot.entity.dto.HistoryData;
 import com.example.boot.entity.dto.HistoryDetailData;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import java.util.List;
 public class HistoryDataManagement {
     private HistoryDataMapper historyDataMapper;
     private HistoryDetailDataMapper historyDetailDataMapper;
+    private HistoryDetailDataService historyDetailDataService;
 
     public HistoryDataManagement(HistoryDataMapper historyDataMapper,
                                  HistoryDetailDataMapper historyDetailDataMapper) {
@@ -23,7 +25,7 @@ public class HistoryDataManagement {
     public void insertHistory(HistoryData historyData) {
         historyDataMapper.insert(historyData);
         List<HistoryDetailData> data = historyData.getData();
-        historyDetailDataMapper.batchInsert(data);
+        historyDetailDataService.batchInsert(data);
     }
 
     public HistoryData queryHistoryDataById(String id) {

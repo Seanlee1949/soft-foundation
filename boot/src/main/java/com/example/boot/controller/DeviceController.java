@@ -5,15 +5,15 @@ import com.example.boot.entity.ConfigParams;
 import com.example.boot.entity.dto.DeviceGroup;
 import com.example.boot.entity.dto.DeviceGroupVo;
 import com.example.boot.entity.response.CommonResponse;
-import com.example.boot.entity.vo.*;
+import com.example.boot.entity.vo.AnalysisVo;
+import com.example.boot.entity.vo.GroupSumVo;
+import com.example.boot.entity.vo.NewestVo;
 import com.example.boot.service.DeviceService;
 import com.example.boot.util.JsonUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author lishuai
@@ -39,58 +39,19 @@ public class DeviceController {
     @GetMapping("/deviceGroups")
     public List<DeviceGroupVo> getDeviceGroups() {
         List<DeviceGroup> deviceGroups = deviceService.getDeviceGroups();
-        List<DeviceGroupVo> collect = deviceGroups.stream().map(new Function<DeviceGroup, DeviceGroupVo>() {
-            @Override
-            public DeviceGroupVo apply(DeviceGroup deviceGroup) {
-                DeviceGroupVo deviceGroupVo = new DeviceGroupVo();
-                deviceGroupVo.setLabel(deviceGroup.getLabel());
-                deviceGroupVo.setName(deviceGroup.getName());
-
-                return deviceGroupVo;
-            }
+        return deviceGroups.stream().map(deviceGroup -> {
+            DeviceGroupVo deviceGroupVo = new DeviceGroupVo();
+            deviceGroupVo.setLabel(deviceGroup.getLabel());
+            deviceGroupVo.setName(deviceGroup.getName());
+            return deviceGroupVo;
         }).collect(Collectors.toList());
-        return collect;
     }
 
     @GetMapping("/devices")
-    public Object getDevices(int size, int current, String deviceType, @CookieValue("userName") String userName) {
-//        String url = replaceUrl + "/api/devices?" + "size=" + size + "&current=" + current + "&deviceType=" + deviceType;
-//        String s = HttpRequest.sendGet(url, "", token);
-
+    public Object getDevices(int size, int current, String deviceType,
+                             @CookieValue("userName") String userName) {
         return deviceService.getDevices(size, current, deviceType);
-//        return JsonUtils.parseObject(s, Object.class);
     }
-
-//    /**
-//     * 获取历史数据列表
-//     * <p>
-//     * 总数量 = page * size
-//     *
-//     * @param startTime    开始时间 单位 秒
-//     * @param endTime
-//     * @param deviceType   JBJ
-//     * @param page         第几页
-//     * @param deviceKey    设备DI
-//     * @param size         每页多少个
-//     * @param pileDescribe 桩描述（手动输入的桩号）
-//     * @return
-//     */
-//    @GetMapping("/historys")
-//    public HistorysVo getHistory(String deviceType, int page, String deviceKey, int size, String pileDescribe,
-//                                 Long startTime, Long endTime,
-//                                 Long minDepth, Long maxDepth,
-//                                 Long minAsh, Long maxAsh,
-//                                 Long minAvgAsh, Long maxAvgAsh,
-//                                 Long minPileTime, Long maxPileTime) {
-//        return deviceService.getHistoryData(deviceType, page, deviceKey, size, pileDescribe,
-//                startTime, endTime,
-//                minDepth, maxDepth,
-//                minAsh, maxAsh,
-//                minAvgAsh, maxAvgAsh,
-//                minPileTime, maxPileTime);
-//
-//
-//    }
 
     /**
      * 获取历史数据列表
@@ -119,33 +80,22 @@ public class DeviceController {
                 minAsh, maxAsh,
                 minAvgAsh, maxAvgAsh,
                 minPileTime, maxPileTime));
-
-
     }
 
 
     @GetMapping("/groupSum")
     public List<GroupSumVo> groupSum() {
-        String url = replaceUrl + "/api/groupSum";
-        String s = HttpRequest.sendGet(url, "", token);
-//        return JsonUtils.parseObject(s, List.class);
         return deviceService.groupSum();
-//        return new GroupSumVo[0];
     }
 
 
     @GetMapping("/newest")
     public List<NewestVo> getNewest() {
-        String url = replaceUrl + "/api/newest";
-        String s = HttpRequest.sendGet(url, "", token);
-//        return JsonUtils.parseObject(s, List.class);
         return deviceService.getNewest();
-//        return new NewestVo[0];
     }
 
 
     @GetMapping("/historyWarns")
-//    public HistoryWarnVo getHistoryWarns(String deviceType, int page, String deviceKey, int size, String pileDescribe) {
     public Object getHistoryWarns(String deviceType, int page, String deviceKey, int size, String pileDescribe) {
         // todo 暂时不做
         String url = replaceUrl + "/api/historyWarns?" + "deviceType=" + deviceType + "&page=" + page
@@ -157,14 +107,16 @@ public class DeviceController {
 
     @GetMapping("/lastData")
     public Object getLastData(String deviceKey, int pileId) {
+        // todo 暂时没用到该功能，暂时不做  --查看设备运行状态
         String url = replaceUrl + "/api/lastData?" + "deviceKey=" + deviceKey + "&pileId=" + pileId;
         String s = HttpRequest.sendGet(url, "", token);
         return JsonUtils.parseObject(s, Object.class);
-//        return new Object();
+//        return null;
     }
 
     @GetMapping("/pileIds")
     public Object getPileIds(String deviceKey) {
+        // todo 暂时没用到该功能，暂时不做  --查看设备运行状态
         String url = replaceUrl + "/api/pileIds?" + "deviceKey=" + deviceKey;
         String s = HttpRequest.sendGet(url, "", token);
         return JsonUtils.parseObject(s, Object.class);
@@ -173,6 +125,7 @@ public class DeviceController {
 
     @GetMapping("/datas")
     public Object getDatas(String deviceKey, int pileId, String[] fields) {
+        // todo  未知 不做
         String url = replaceUrl + "/api/lastData?" + "deviceKey=" + deviceKey + "&pileId=" + pileId +
                 "&fields=" + fields;
         String s = HttpRequest.sendGet(url, "", token);
@@ -186,12 +139,13 @@ public class DeviceController {
     }
 
     @GetMapping("/historyAnalysis")
-    public Object getHistoryAnalysis(String deviceKey, String deviceType, long beginDate, long endDate) {
-        String url = replaceUrl + "/api/historyAnalysis?" + "deviceKey=" + deviceKey + "&deviceType=" + deviceType
-                + "&beginData=" + beginDate + "&endData=" + endDate;
-        String s = HttpRequest.sendGet(url, "", token);
-//        return JsonUtils.parseObject(s, Object.class);
-
+    public Object getHistoryAnalysis(String deviceKey, String deviceType, Long beginDate, Long endDate) {
+        if (beginDate == null) {
+            beginDate = 0L;
+        }
+        if (endDate == null) {
+            endDate = 16085180990L;
+        }
         return deviceService.getHistoryAnalysis(deviceKey, deviceType, beginDate, endDate);
     }
 

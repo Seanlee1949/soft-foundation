@@ -31,13 +31,14 @@ public class InitRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        LOGGER.debug("项目初始化：刷新历史详情缓存");
-        deviceService.getAllHistoryDetailData();
-        LOGGER.debug("项目初始化：刷新历史数据缓存");
-        deviceService.getAllHistoryData();
-        LOGGER.debug("项目初始化：刷新设备和详情map缓存");
+        LOGGER.info("项目初始化：do nothing");
+//        LOGGER.debug("项目初始化：刷新历史详情缓存");
+//        deviceService.getAllHistoryDetailData();
+//        LOGGER.debug("项目初始化：刷新历史数据缓存");
+//        deviceService.getAllHistoryData();
+//        LOGGER.debug("项目初始化：刷新设备和详情map缓存");
 //        deviceService.getDetailAndDeviceMap();
-        LOGGER.debug("项目初始化：开始定时任务");
+//        LOGGER.debug("项目初始化：开始定时任务");
 //        schedulerUtils.startJob();
     }
 

@@ -1,4 +1,4 @@
-package com.example.boot.controller;
+package com.example.boot.controller.mock;
 
 import com.example.boot.dao.RecordMapper;
 import com.example.boot.data.DataScrap;
@@ -61,7 +61,7 @@ public class MockData2 {
     private static double maxDensity = 1.75;
     private static int partId = 0;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(com.example.boot.controller.MockDataController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MockDataController.class);
     @Autowired
     private DataScrap dataScrap;
     @Autowired
@@ -69,6 +69,42 @@ public class MockData2 {
 
     @Autowired
     private RecordMapper recordMapper;
+
+    @GetMapping("/update-history-data0620")
+    public void updateHistoryDataByFile0620() throws IOException {
+        String deviceKey = "MX01808023020020";
+//        String filePath = "C:\\Users\\25455\\Desktop\\4、水泥土搅拌桩(细微版)20221109.xlsx";
+        String filePath = "C:\\Users\\25455\\Desktop\\3.xlsx";
+        XSSFWorkbook xssfWorkbook = new XSSFWorkbook(filePath);
+        XSSFSheet sheetAt = xssfWorkbook.getSheetAt(0);
+        Map<String, List<XSSFRow>> pileNumAndDataMap = new LinkedHashMap<>();
+        for (int i = 2; i < 3; i++) {
+            pileNumAndDataMap.putAll(getPileNumAndDataMap(xssfWorkbook.getSheetAt(i)));
+        }
+
+
+        // 拆分为一个桩的数据
+//        Map<String, List<XSSFRow>> pileNumAndDataMap = getPileNumAndDataMap(sheetAt);
+        LOGGER.debug("处理完毕，共{}组桩数据", pileNumAndDataMap.size());
+
+
+        List<HistoryData> historyDataList = new ArrayList<>();
+        // 将桩数据转化为 平台支持的导入格式
+        for (Map.Entry<String, List<XSSFRow>> entry : pileNumAndDataMap.entrySet()) {
+            LOGGER.debug("正在处理{}", entry.getKey());
+            String pileDesc = entry.getKey();
+            List<XSSFRow> onePileData = entry.getValue();
+            HistoryData historyData = dealPiceOfData(deviceKey, pileDesc.replace("#", ""), onePileData);
+            historyDataList.add(historyData);
+        }
+
+        HistorysVo historysVo = new HistorysVo();
+        historysVo.setContent(historyDataList);
+        dataScrap.dealHistoryVoAndInsertOrUpdate(historyDataList.size(), historysVo, true);
+
+
+        deviceService.refreshCache();
+    }
 
     @GetMapping("/update-history-data0516")
     public void updateHistoryDataByFile0516() throws IOException {

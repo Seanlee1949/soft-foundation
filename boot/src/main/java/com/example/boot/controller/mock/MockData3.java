@@ -1,4 +1,4 @@
-package com.example.boot.controller;
+package com.example.boot.controller.mock;
 
 import com.example.boot.data.DataScrap;
 import com.example.boot.entity.dto.HistoryData;

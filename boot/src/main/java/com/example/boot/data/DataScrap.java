@@ -22,6 +22,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Supplier;
 
 /**
  * @author lishuai
@@ -355,22 +358,66 @@ public class DataScrap {
         LOGGER.info("共查询到数据{}页", totalPages);
 
         List<HistorysVo> historyVoList = new ArrayList<>();
-        for (int page = 0; page <= totalPages + 1; page++) {
-            LOGGER.debug("加载第{}页", page);
+        for (int page = 0; page <= totalPages + 1; ) {
 
-            String url = "https://platform.hzcjkj.com/api/historys?deviceType=JBZ&page=" + page +
-                    "&deviceKey=&size=10&pileDescribe=&startTime="
-                    + startTime + "&endTime=" + endTime;
-            String historyResponse = HttpRequest.sendGet(url, "", token);
-            HistorysVo historysVo = JsonUtils.parseObject(historyResponse, HistorysVo.class);
+            List<CompletableFuture<HistorysVo>> completableFutureList = new ArrayList<>(5);
+            CompletableFuture<HistorysVo> historyVoFuture0 = getHistoryVoFuture(startTime, endTime, token, page);
+            CompletableFuture<HistorysVo> historyVoFuture1 = getHistoryVoFuture(startTime, endTime, token, page + 1);
+            CompletableFuture<HistorysVo> historyVoFuture2 = getHistoryVoFuture(startTime, endTime, token, page + 2);
+            CompletableFuture<HistorysVo> historyVoFuture3 = getHistoryVoFuture(startTime, endTime, token, page + 3);
+            CompletableFuture<HistorysVo> historyVoFuture4 = getHistoryVoFuture(startTime, endTime, token, page + 4);
+            completableFutureList.add(historyVoFuture0);
+            completableFutureList.add(historyVoFuture1);
+            completableFutureList.add(historyVoFuture2);
+            completableFutureList.add(historyVoFuture3);
+            completableFutureList.add(historyVoFuture4);
+            page = page + 5;
+            for (CompletableFuture<HistorysVo> historyVoCompletableFuture : completableFutureList) {
+                try {
+                    HistorysVo historysVo = historyVoCompletableFuture.get();
+                    if (historysVo.getContent().size() == 0) {
+                        continue;
+                    }
+                    historyVoList.add(historysVo);
+                } catch (InterruptedException e) {
+                    LOGGER.error("解析失败,page = {}", page, e);
+                } catch (ExecutionException e) {
+                    LOGGER.error("解析失败,page = {}", page, e);
+                }
 
-            if (historysVo.getContent().size() == 0) {
-                continue;
             }
-            historyVoList.add(historysVo);
+            LOGGER.debug("处理完成一组5个，第{}页至第{}页", page - 5, page);
+
+//
+////            HistorysVo historysVo = getHistoryVoByPage(startTime, endTime, token, page);
+//
+//            if (historysVo.getContent().size() == 0) {
+//                continue;
+//            }
+//            historyVoList.add(historysVo);
         }
         LOGGER.info("收集到的数据数量，historysVoList.size->{}", historyVoList.size());
         return historyVoList;
+    }
+
+    private CompletableFuture<HistorysVo> getHistoryVoFuture(long startTime, long endTime, String token, int pageTemp1) {
+        return CompletableFuture.supplyAsync(new Supplier<HistorysVo>() {
+            @Override
+            public HistorysVo get() {
+                return DataScrap.this.getHistoryVoByPage(startTime, endTime, token, pageTemp1);
+            }
+        });
+    }
+
+    private HistorysVo getHistoryVoByPage(long startTime, long endTime, String token, int page) {
+        LOGGER.debug("加载第{}页", page);
+
+        String url = "https://platform.hzcjkj.com/api/historys?deviceType=JBZ&page=" + page +
+                "&deviceKey=&size=10&pileDescribe=&startTime="
+                + startTime + "&endTime=" + endTime;
+        String historyResponse = HttpRequest.sendGet(url, "", token);
+        HistorysVo historysVo = JsonUtils.parseObject(historyResponse, HistorysVo.class);
+        return historysVo;
     }
 
     private int getTotalPages(long startTime, long endTime, String token) {

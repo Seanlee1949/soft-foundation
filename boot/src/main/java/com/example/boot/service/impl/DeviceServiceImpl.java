@@ -540,13 +540,14 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     public HistoryAnalysis getHistoryAnalysis(String deviceKey, String deviceType, long beginDate, long endDate) {
         List<HistoryData> allHistoryData = getAllHistoryData();
-        List<HistoryData> historyDataList = allHistoryData.stream().filter(historyData -> {
-            if (!StringUtils.isEmpty(deviceKey)) {
-                return historyData.getDeviceKey().equals(deviceKey);
-            } else {
-                return true;
-            }
-        })
+        List<HistoryData> historyDataList = allHistoryData.stream()
+                .filter(historyData -> {
+                    if (!StringUtils.isEmpty(deviceKey)) {
+                        return historyData.getDeviceKey().equals(deviceKey);
+                    } else {
+                        return true;
+                    }
+                })
                 .filter(historyData -> {
                     if (!StringUtils.isEmpty(deviceType)) {
                         return historyData.getDeviceType().equals(deviceType);

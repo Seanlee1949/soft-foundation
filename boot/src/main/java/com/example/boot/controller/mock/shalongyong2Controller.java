@@ -1,6 +1,7 @@
-package com.example.boot.controller;
+package com.example.boot.controller.mock;
 
 import com.example.boot.constant.CommonConstant;
+import com.example.boot.dao.HistoryDataMapper;
 import com.example.boot.dao.HistoryDetailDataMapper;
 import com.example.boot.dao.RecordMapper;
 import com.example.boot.data.DataScrap;
@@ -60,6 +61,8 @@ public class shalongyong2Controller {
     private RecordMapper recordMapper;
     @Autowired
     private HistoryDetailDataMapper historyDetailDataMapper;
+    @Autowired
+    private HistoryDataMapper historyDataMapper;
 
     @Autowired
     HistoryDataManagement historyDataManagement;
@@ -83,7 +86,6 @@ public class shalongyong2Controller {
 
         return CommonConstant.SUCCESS;
     }
-
     /**
      * 账号
      * 沙龙涌北侧地块周边市政道路配套工程

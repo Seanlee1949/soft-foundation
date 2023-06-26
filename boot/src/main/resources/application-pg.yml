@@ -2,15 +2,15 @@ spring:
   #H2数据库配置
   datasource:
     #驱动
-    driver-class-name: org.h2.Driver
+    driver-class-name: org.postgresql.Driver
     #配置h2数据库的连接地址
-    url: jdbc:h2:./database/sf_data;COMPRESS=TRUE
+    url: jdbc:postgresql://localhost:5432/sf_data
     #用户名
     username: root
     #密码
     password: admin
     #H2数据初始化配置
-    platform: h2
+    platform: postgresql
     #每次启动程序，程序都会运行schema.sql文件，对数据库的数据操作；如果数据文件有多个，使用逗号拼接
     schema: classpath*:sql/h2/db_init/init.sql
     #每次启动程序，程序都会运行data.sql文件，对数据库的数据操作；如果数据文件有多个，使用逗号拼接

@@ -1,5 +1,6 @@
 package com.example.boot.dao;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.example.boot.entity.dto.HistoryDetailData;
 import org.apache.ibatis.annotations.Delete;
@@ -34,8 +35,14 @@ public interface HistoryDetailDataMapper extends BaseMapper<HistoryDetailData> {
 //    }
 
 
-    default void batchInsert(List<HistoryDetailData> historyDetailDataList) {
+//    default void batchInsert(List<HistoryDetailData> historyDetailDataList) {
+//
+//
+//    }
 
-
+    default List<HistoryDetailData> selectByPileKey(String pileKey) {
+        QueryWrapper<HistoryDetailData> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("PILE_KEY", pileKey);
+        return this.selectList(queryWrapper);
     }
 }

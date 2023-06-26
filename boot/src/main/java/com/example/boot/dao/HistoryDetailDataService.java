@@ -38,4 +38,8 @@ public class HistoryDetailDataService {
                     };
                 }).collect(Collectors.toList()));
     }
+
+    public void deleteAll() {
+        jdbcTemplate.execute("TRUNCATE TABLE SF_HISTORY_DETAIL_DATA");
+    }
 }

@@ -1,4 +1,4 @@
-package com.example.boot.controller;
+package com.example.boot.controller.mock;
 
 import com.example.boot.constant.CommonConstant;
 import com.example.boot.dao.RecordMapper;
